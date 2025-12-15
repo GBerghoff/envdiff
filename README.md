@@ -7,13 +7,17 @@ Compare any two environments and get a precise, categorized diff of everything t
 ## Install
 
 ```bash
-# Go install
-go install github.com/gberghoff/envdiff/cmd/envdiff@latest
+# Quick install (Linux/macOS)
+curl -fsSL https://raw.githubusercontent.com/GBerghoff/envdiff/main/install.sh | sh
 
-# Or build from source
-git clone https://github.com/gberghoff/envdiff.git
-cd envdiff
-go build -o envdiff ./cmd/envdiff
+# Homebrew (coming soon)
+# brew install GBerghoff/tap/envdiff
+
+# Go install
+go install github.com/GBerghoff/envdiff/cmd/envdiff@latest
+
+# Or download binary directly from releases
+# https://github.com/GBerghoff/envdiff/releases
 ```
 
 ## Quick Start

@@ -1,5 +1,5 @@
 # Binaries
-envdiff
+/envdiff
 *.exe
 *.dll
 *.so
