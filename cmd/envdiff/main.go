@@ -7,10 +7,7 @@ import (
 	"github.com/spf13/cobra"
 )
 
-var (
-	version = "dev"
-	commit  = "none"
-)
+var version = "dev"
 
 var rootCmd = &cobra.Command{
 	Use:   "envdiff",

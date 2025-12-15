@@ -1,7 +1,6 @@
 package main
 
 import (
-	"encoding/json"
 	"fmt"
 	"os"
 	"path/filepath"
@@ -72,32 +71,4 @@ func runCompare(cmd *cobra.Command, args []string) error {
 	}
 
 	return nil
-}
-
-// Helper to load snapshots from a file that might contain an array
-func loadSnapshots(path string) (map[string]*snapshot.Snapshot, error) {
-	data, err := os.ReadFile(path)
-	if err != nil {
-		return nil, err
-	}
-
-	// Try to parse as array first
-	var snapArray []*snapshot.Snapshot
-	if err := json.Unmarshal(data, &snapArray); err == nil {
-		result := make(map[string]*snapshot.Snapshot)
-		for _, s := range snapArray {
-			result[s.Hostname] = s
-		}
-		return result, nil
-	}
-
-	// Try as single snapshot
-	var snap snapshot.Snapshot
-	if err := json.Unmarshal(data, &snap); err == nil {
-		return map[string]*snapshot.Snapshot{
-			snap.Hostname: &snap,
-		}, nil
-	}
-
-	return nil, fmt.Errorf("could not parse snapshot file")
 }
