@@ -1,3 +1,5 @@
+![envdiff](assets/banner.png)
+
 # envdiff
 
 > "It works on my machine" → "Show me exactly why."
@@ -128,69 +130,12 @@ fix:
 
 ### Snapshot (CLI)
 
-```
-envdiff — snapshot of macbook-pro
-
-SYSTEM
-  os             macOS 14.2.1
-  arch           arm64
-  kernel         23.2.0
-  cpu            10 cores
-  memory         32GB
-
-RUNTIME
-  ✓ go             1.22.0
-  ✓ node           20.11.0
-  ✓ python         3.12.1
-  ✓ docker         24.0.7
-
-ENVIRONMENT
-  47 variables (5 redacted)
-```
+![envdiff snapshot](assets/snapshot.gif)
 
 ### Diff (CLI)
 
-```
-envdiff — comparing local ↔ ci
-
-RUNTIME
-  ✗ node      20.11.0 → 18.19.0
-  ✗ python    3.12.1 → (missing)
-  ✓ go        1.22.0
-
-ENVIRONMENT
-  ✗ NODE_ENV       development → production
-  ⊘ DATABASE_URL   [REDACTED]
-  ✓ 42 variables match
-
-────────────────────────────────────────
-2 different · 42 equal · 1 redacted
-```
+![envdiff diff](assets/diff.gif)
 
 ### Check
 
-```
-envdiff — checking requirements
-
-RUNTIME
-  ✓ go             1.22.0     (requires >= 1.21.0)
-  ✓ node           20.11.0    (requires >= 18.0.0)
-  ✗ python         (missing)  (requires >= 3.10.0)
-
-ENVIRONMENT
-  ✓ DATABASE_URL   (set)
-  ✗ AWS_PROFILE    (missing)
-
-────────────────────────────────────────
-3 passed · 2 failed
-
-To fix:
-  • python: brew install python@3.10
-  • AWS_PROFILE: Set required environment variable
-```
-
-## Use Cases
-
-1. **"Why does CI fail when it passes locally?"** — Snapshot both, diff them
-2. **New hire onboarding** — `envdiff check` beats a 47-step setup doc
-3. **Incident debugging** — "What changed since it last worked?"
+![envdiff check](assets/check.gif)

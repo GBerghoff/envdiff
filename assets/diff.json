@@ -1,0 +1,275 @@
+{
+  "schema_version": "1",
+  "generated_at": "2025-12-19T19:55:55Z",
+  "nodes": [
+    "local",
+    "ci"
+  ],
+  "errors": {},
+  "summary": {
+    "total_nodes": 2,
+    "successful_nodes": 2,
+    "failed_nodes": 0,
+    "total_fields": 20,
+    "equal": 4,
+    "different": 15,
+    "redacted": 1
+  },
+  "diffs": {
+    "env": {
+      "CI": {
+        "status": "different",
+        "values": {
+          "ci": "true",
+          "local": null
+        }
+      },
+      "DATABASE_URL": {
+        "status": "redacted",
+        "values": {
+          "ci": "[REDACTED]",
+          "local": "[REDACTED]"
+        }
+      },
+      "GITHUB_ACTIONS": {
+        "status": "different",
+        "values": {
+          "ci": "true",
+          "local": null
+        }
+      },
+      "HOME": {
+        "status": "different",
+        "values": {
+          "ci": "/home/runner",
+          "local": "/Users/dev"
+        }
+      },
+      "LANG": {
+        "status": "different",
+        "values": {
+          "ci": "C.UTF-8",
+          "local": "en_US.UTF-8"
+        }
+      },
+      "NODE_ENV": {
+        "status": "different",
+        "values": {
+          "ci": "production",
+          "local": "development"
+        }
+      },
+      "PATH": {
+        "status": "equal",
+        "values": {
+          "ci": "/usr/local/bin:/usr/bin:/bin",
+          "local": "/usr/local/bin:/usr/bin:/bin"
+        }
+      },
+      "SHELL": {
+        "status": "different",
+        "values": {
+          "ci": "/bin/bash",
+          "local": "/bin/zsh"
+        }
+      },
+      "USER": {
+        "status": "different",
+        "values": {
+          "ci": "runner",
+          "local": "dev"
+        }
+      }
+    },
+    "runtime": {
+      "docker": {
+        "status": "equal",
+        "values": {
+          "ci": "24.0.7",
+          "local": "24.0.7"
+        }
+      },
+      "git": {
+        "status": "equal",
+        "values": {
+          "ci": "2.43.0",
+          "local": "2.43.0"
+        }
+      },
+      "go": {
+        "status": "equal",
+        "values": {
+          "ci": "1.22.0",
+          "local": "1.22.0"
+        }
+      },
+      "node": {
+        "status": "different",
+        "values": {
+          "ci": "18.19.0",
+          "local": "20.11.0"
+        }
+      },
+      "python": {
+        "status": "different",
+        "values": {
+          "ci": null,
+          "local": "3.12.1"
+        }
+      }
+    },
+    "system": {
+      "arch": {
+        "status": "different",
+        "values": {
+          "ci": "amd64",
+          "local": "arm64"
+        }
+      },
+      "cpu_cores": {
+        "status": "different",
+        "values": {
+          "ci": 4,
+          "local": 10
+        }
+      },
+      "kernel": {
+        "status": "different",
+        "values": {
+          "ci": "5.15.0-1057-azure",
+          "local": "23.2.0"
+        }
+      },
+      "memory_gb": {
+        "status": "different",
+        "values": {
+          "ci": 16,
+          "local": 32
+        }
+      },
+      "os": {
+        "status": "different",
+        "values": {
+          "ci": "linux",
+          "local": "darwin"
+        }
+      },
+      "os_version": {
+        "status": "different",
+        "values": {
+          "ci": "Ubuntu 22.04.3 LTS",
+          "local": "macOS 14.2.1"
+        }
+      }
+    }
+  },
+  "snapshots": {
+    "ci": {
+      "schema_version": "1",
+      "snapshot_id": "ci-runner",
+      "timestamp": "2025-12-19T19:45:33Z",
+      "hostname": "github-runner",
+      "collected_via": "local",
+      "system": {
+        "os": "linux",
+        "os_version": "Ubuntu 22.04.3 LTS",
+        "arch": "amd64",
+        "kernel": "5.15.0-1057-azure",
+        "cpu_cores": 4,
+        "memory_gb": 16,
+        "hostname": "github-runner"
+      },
+      "runtime": {
+        "docker": {
+          "version": "24.0.7",
+          "path": "/usr/bin/docker"
+        },
+        "git": {
+          "version": "2.43.0",
+          "path": "/usr/bin/git"
+        },
+        "go": {
+          "version": "1.22.0",
+          "path": "/usr/local/go/bin/go"
+        },
+        "node": {
+          "version": "18.19.0",
+          "path": "/usr/local/bin/node"
+        }
+      },
+      "env": {
+        "CI": "true",
+        "DATABASE_URL": "[REDACTED]",
+        "GITHUB_ACTIONS": "true",
+        "HOME": "/home/runner",
+        "LANG": "C.UTF-8",
+        "NODE_ENV": "production",
+        "PATH": "/usr/local/bin:/usr/bin:/bin",
+        "SHELL": "/bin/bash",
+        "USER": "runner"
+      },
+      "network": {
+        "hosts": {
+          "localhost": "127.0.0.1"
+        },
+        "listening_ports": []
+      }
+    },
+    "local": {
+      "schema_version": "1",
+      "snapshot_id": "local-dev",
+      "timestamp": "2025-12-19T19:45:33Z",
+      "hostname": "macbook-pro",
+      "collected_via": "local",
+      "system": {
+        "os": "darwin",
+        "os_version": "macOS 14.2.1",
+        "arch": "arm64",
+        "kernel": "23.2.0",
+        "cpu_cores": 10,
+        "memory_gb": 32,
+        "hostname": "macbook-pro"
+      },
+      "runtime": {
+        "docker": {
+          "version": "24.0.7",
+          "path": "/usr/local/bin/docker"
+        },
+        "git": {
+          "version": "2.43.0",
+          "path": "/usr/bin/git"
+        },
+        "go": {
+          "version": "1.22.0",
+          "path": "/usr/local/go/bin/go"
+        },
+        "node": {
+          "version": "20.11.0",
+          "path": "/usr/local/bin/node"
+        },
+        "python": {
+          "version": "3.12.1",
+          "path": "/usr/local/bin/python3"
+        }
+      },
+      "env": {
+        "DATABASE_URL": "[REDACTED]",
+        "HOME": "/Users/dev",
+        "LANG": "en_US.UTF-8",
+        "NODE_ENV": "development",
+        "PATH": "/usr/local/bin:/usr/bin:/bin",
+        "SHELL": "/bin/zsh",
+        "USER": "dev"
+      },
+      "network": {
+        "hosts": {
+          "localhost": "127.0.0.1"
+        },
+        "listening_ports": [
+          3000,
+          5432
+        ]
+      }
+    }
+  }
+}

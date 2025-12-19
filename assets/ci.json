@@ -1,0 +1,51 @@
+{
+  "schema_version": "1",
+  "snapshot_id": "ci-runner",
+  "timestamp": "2025-12-19T19:45:33Z",
+  "hostname": "github-runner",
+  "collected_via": "local",
+  "system": {
+    "os": "linux",
+    "os_version": "Ubuntu 22.04.3 LTS",
+    "arch": "amd64",
+    "kernel": "5.15.0-1057-azure",
+    "cpu_cores": 4,
+    "memory_gb": 16,
+    "hostname": "github-runner"
+  },
+  "runtime": {
+    "docker": {
+      "version": "24.0.7",
+      "path": "/usr/bin/docker"
+    },
+    "git": {
+      "version": "2.43.0",
+      "path": "/usr/bin/git"
+    },
+    "go": {
+      "version": "1.22.0",
+      "path": "/usr/local/go/bin/go"
+    },
+    "node": {
+      "version": "18.19.0",
+      "path": "/usr/local/bin/node"
+    }
+  },
+  "env": {
+    "CI": "true",
+    "GITHUB_ACTIONS": "true",
+    "HOME": "/home/runner",
+    "LANG": "C.UTF-8",
+    "NODE_ENV": "production",
+    "PATH": "/usr/local/bin:/usr/bin:/bin",
+    "SHELL": "/bin/bash",
+    "USER": "runner",
+    "DATABASE_URL": "[REDACTED]"
+  },
+  "network": {
+    "hosts": {
+      "localhost": "127.0.0.1"
+    },
+    "listening_ports": []
+  }
+}

@@ -1,0 +1,53 @@
+{
+  "schema_version": "1",
+  "snapshot_id": "local-dev",
+  "timestamp": "2025-12-19T19:45:33Z",
+  "hostname": "macbook-pro",
+  "collected_via": "local",
+  "system": {
+    "os": "darwin",
+    "os_version": "macOS 14.2.1",
+    "arch": "arm64",
+    "kernel": "23.2.0",
+    "cpu_cores": 10,
+    "memory_gb": 32,
+    "hostname": "macbook-pro"
+  },
+  "runtime": {
+    "docker": {
+      "version": "24.0.7",
+      "path": "/usr/local/bin/docker"
+    },
+    "git": {
+      "version": "2.43.0",
+      "path": "/usr/bin/git"
+    },
+    "go": {
+      "version": "1.22.0",
+      "path": "/usr/local/go/bin/go"
+    },
+    "node": {
+      "version": "20.11.0",
+      "path": "/usr/local/bin/node"
+    },
+    "python": {
+      "version": "3.12.1",
+      "path": "/usr/local/bin/python3"
+    }
+  },
+  "env": {
+    "HOME": "/Users/dev",
+    "LANG": "en_US.UTF-8",
+    "NODE_ENV": "development",
+    "PATH": "/usr/local/bin:/usr/bin:/bin",
+    "SHELL": "/bin/zsh",
+    "USER": "dev",
+    "DATABASE_URL": "[REDACTED]"
+  },
+  "network": {
+    "hosts": {
+      "localhost": "127.0.0.1"
+    },
+    "listening_ports": [3000, 5432]
+  }
+}
