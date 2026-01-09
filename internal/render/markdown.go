@@ -4,8 +4,8 @@ import (
 	"fmt"
 	"strings"
 
-	"github.com/gberghoff/envdiff/internal/diff"
-	"github.com/gberghoff/envdiff/internal/snapshot"
+	"github.com/GBerghoff/envdiff/internal/diff"
+	"github.com/GBerghoff/envdiff/internal/snapshot"
 )
 
 // MarkdownRenderer renders output as Markdown

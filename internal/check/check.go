@@ -8,8 +8,8 @@ import (
 	"strings"
 
 	"github.com/Masterminds/semver/v3"
-	"github.com/gberghoff/envdiff/internal/config"
-	"github.com/gberghoff/envdiff/internal/snapshot"
+	"github.com/GBerghoff/envdiff/internal/config"
+	"github.com/GBerghoff/envdiff/internal/snapshot"
 )
 
 // Result represents a single check result

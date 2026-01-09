@@ -1,4 +1,4 @@
-module github.com/gberghoff/envdiff
+module github.com/GBerghoff/envdiff
 
 go 1.22.2
 

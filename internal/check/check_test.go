@@ -3,8 +3,8 @@ package check
 import (
 	"testing"
 
-	"github.com/gberghoff/envdiff/internal/config"
-	"github.com/gberghoff/envdiff/internal/snapshot"
+	"github.com/GBerghoff/envdiff/internal/config"
+	"github.com/GBerghoff/envdiff/internal/snapshot"
 )
 
 func TestCheck_RuntimeConstraints(t *testing.T) {

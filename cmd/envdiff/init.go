@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"os"
 
-	"github.com/gberghoff/envdiff/internal/config"
+	"github.com/GBerghoff/envdiff/internal/config"
 	"github.com/spf13/cobra"
 )
 

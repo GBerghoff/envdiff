@@ -4,10 +4,10 @@ import (
 	"fmt"
 	"os"
 
-	"github.com/gberghoff/envdiff/internal/check"
-	"github.com/gberghoff/envdiff/internal/collector"
-	"github.com/gberghoff/envdiff/internal/config"
-	"github.com/gberghoff/envdiff/internal/snapshot"
+	"github.com/GBerghoff/envdiff/internal/check"
+	"github.com/GBerghoff/envdiff/internal/collector"
+	"github.com/GBerghoff/envdiff/internal/config"
+	"github.com/GBerghoff/envdiff/internal/snapshot"
 	"github.com/spf13/cobra"
 )
 
