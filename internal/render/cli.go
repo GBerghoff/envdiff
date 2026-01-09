@@ -6,8 +6,8 @@ import (
 	"strings"
 
 	"github.com/charmbracelet/lipgloss"
-	"github.com/gberghoff/envdiff/internal/diff"
-	"github.com/gberghoff/envdiff/internal/snapshot"
+	"github.com/GBerghoff/envdiff/internal/diff"
+	"github.com/GBerghoff/envdiff/internal/snapshot"
 )
 
 // CLIRenderer renders output for the terminal

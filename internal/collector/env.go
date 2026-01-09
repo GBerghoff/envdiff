@@ -4,8 +4,8 @@ import (
 	"os"
 	"strings"
 
-	"github.com/gberghoff/envdiff/internal/secrets"
-	"github.com/gberghoff/envdiff/internal/snapshot"
+	"github.com/GBerghoff/envdiff/internal/secrets"
+	"github.com/GBerghoff/envdiff/internal/snapshot"
 )
 
 // EnvCollector gathers environment variables

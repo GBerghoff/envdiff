@@ -5,7 +5,7 @@ import (
 	"regexp"
 	"strings"
 
-	"github.com/gberghoff/envdiff/internal/snapshot"
+	"github.com/GBerghoff/envdiff/internal/snapshot"
 )
 
 // runtimeDef defines how to detect a runtime/CLI tool

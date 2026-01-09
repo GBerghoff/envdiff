@@ -9,7 +9,7 @@ import (
 	"strconv"
 	"strings"
 
-	"github.com/gberghoff/envdiff/internal/snapshot"
+	"github.com/GBerghoff/envdiff/internal/snapshot"
 )
 
 // NetworkCollector gathers network-related information
