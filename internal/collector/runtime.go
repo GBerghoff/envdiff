@@ -126,6 +126,12 @@ var runtimes = []runtimeDef{
 		Args:      []string{"--version"},
 		VersionRE: regexp.MustCompile(`GNU Make (\d+\.\d+\.?\d*)`),
 	},
+	{
+		Name:      "svn",
+		Command:   "svn",
+		Args:      []string{"--version", "--quiet"},
+		VersionRE: regexp.MustCompile(`(\d+\.\d+\.?\d*)`),
+	},
 }
 
 // RuntimeCollector detects installed runtimes and CLI tools
