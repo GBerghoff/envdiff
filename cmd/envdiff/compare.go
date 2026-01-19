@@ -62,7 +62,7 @@ func runCompare(cmd *cobra.Command, args []string) error {
 	}
 
 	if compareOutput != "" {
-		if err := os.WriteFile(compareOutput, output, 0644); err != nil {
+		if err := os.WriteFile(compareOutput, output, 0600); err != nil {
 			return fmt.Errorf("failed to write output: %w", err)
 		}
 		fmt.Fprintf(os.Stderr, "Diff saved to %s\n", compareOutput)

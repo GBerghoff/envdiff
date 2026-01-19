@@ -69,7 +69,7 @@ func runRender(cmd *cobra.Command, args []string) error {
 	}
 
 	if renderOutput != "" {
-		if err := os.WriteFile(renderOutput, []byte(output), 0644); err != nil {
+		if err := os.WriteFile(renderOutput, []byte(output), 0600); err != nil {
 			return fmt.Errorf("failed to write output: %w", err)
 		}
 		fmt.Fprintf(os.Stderr, "Output saved to %s\n", renderOutput)
