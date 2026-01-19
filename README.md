@@ -2,6 +2,10 @@
 
 # envdiff
 
+[![Go Report Card](https://goreportcard.com/badge/github.com/GBerghoff/envdiff)](https://goreportcard.com/report/github.com/GBerghoff/envdiff)
+[![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](https://opensource.org/licenses/MIT)
+[![Release](https://img.shields.io/github/v/release/GBerghoff/envdiff)](https://github.com/GBerghoff/envdiff/releases/latest)
+
 > "It works on my machine" → "Show me exactly why."
 
 Compare any two environments and get a precise, categorized diff of everything that could possibly matter.
