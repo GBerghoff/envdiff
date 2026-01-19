@@ -1,0 +1,25 @@
+version: "2"
+
+run:
+  timeout: 5m
+
+linters:
+  default: standard
+  enable:
+    - misspell
+    - unconvert
+    - unparam
+    - gosec
+    - prealloc
+  exclusions:
+    rules:
+      # G304: File path from variable - expected for CLI that reads user-specified files
+      - linters: [gosec]
+        text: "G304"
+      # G204: Subprocess with variable args - expected for CLI that detects tool versions
+      - linters: [gosec]
+        text: "G204"
+
+issues:
+  max-issues-per-linter: 0
+  max-same-issues: 0

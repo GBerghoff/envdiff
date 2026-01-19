@@ -16,8 +16,13 @@ jobs:
           go-version-file: go.mod
       - name: Build
         run: go build ./...
-      - name: Test
-        run: go test -race ./...
+      - name: Test with coverage
+        run: go test -race -coverprofile=coverage.out -covermode=atomic ./...
+      - name: Upload coverage to Codecov
+        uses: codecov/codecov-action@v5
+        with:
+          files: coverage.out
+          fail_ci_if_error: false
       - name: Vet
         run: go vet ./...
 

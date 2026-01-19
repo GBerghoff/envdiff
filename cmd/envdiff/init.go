@@ -40,7 +40,7 @@ func runInit(cmd *cobra.Command, args []string) error {
 
 	// Write template
 	template := config.Template()
-	if err := os.WriteFile(filename, []byte(template), 0644); err != nil {
+	if err := os.WriteFile(filename, []byte(template), 0600); err != nil {
 		return fmt.Errorf("failed to write %s: %w", filename, err)
 	}
 

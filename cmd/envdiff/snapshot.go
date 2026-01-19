@@ -79,7 +79,7 @@ func runSnapshot(cmd *cobra.Command, args []string) error {
 
 	// Write output
 	if snapshotOutput != "" {
-		if err := os.WriteFile(snapshotOutput, output, 0644); err != nil {
+		if err := os.WriteFile(snapshotOutput, output, 0600); err != nil {
 			return fmt.Errorf("failed to write output: %w", err)
 		}
 		fmt.Fprintf(os.Stderr, "Snapshot saved to %s\n", snapshotOutput)
