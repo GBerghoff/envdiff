@@ -57,7 +57,7 @@ func (c *SystemCollector) getLinuxOSVersion() string {
 	if err != nil {
 		return "Linux"
 	}
-	defer file.Close()
+	defer func() { _ = file.Close() }()
 
 	scanner := bufio.NewScanner(file)
 	var prettyName string
@@ -114,7 +114,7 @@ func (c *SystemCollector) getLinuxMemory() int {
 	if err != nil {
 		return 0
 	}
-	defer file.Close()
+	defer func() { _ = file.Close() }()
 
 	scanner := bufio.NewScanner(file)
 	for scanner.Scan() {

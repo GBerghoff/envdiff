@@ -116,9 +116,8 @@ func renderResult(r Result) string {
 		keyStyle.Render(r.Name),
 		valueStyle.Render(r.Actual))
 
-	if style == "pass" {
-		line += dimStyle.Render(fmt.Sprintf(" (requires %s)", r.Expected))
-	} else if style == "fail" {
+	switch style {
+	case "pass", "fail":
 		line += dimStyle.Render(fmt.Sprintf(" (requires %s)", r.Expected))
 	}
 

@@ -31,7 +31,7 @@ func (c *NetworkCollector) getHosts() map[string]string {
 	if err != nil {
 		return hosts
 	}
-	defer file.Close()
+	defer func() { _ = file.Close() }()
 
 	scanner := bufio.NewScanner(file)
 	for scanner.Scan() {
