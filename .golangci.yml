@@ -2,29 +2,15 @@ version: "2"
 
 run:
   timeout: 5m
-  modules-download-mode: readonly
 
 linters:
   default: standard
   enable:
-    - gofmt
-    - goimports
     - misspell
     - unconvert
     - unparam
     - gosec
     - prealloc
-  settings:
-    gofmt:
-      simplify: true
-    goimports:
-      local-prefixes:
-        - github.com/GBerghoff/envdiff
-    misspell:
-      locale: US
-    gosec:
-      excludes:
-        - G104
 
 issues:
   max-issues-per-linter: 0
