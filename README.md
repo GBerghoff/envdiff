@@ -2,9 +2,11 @@
 
 # envdiff
 
+[![CI](https://github.com/GBerghoff/envdiff/actions/workflows/ci.yml/badge.svg)](https://github.com/GBerghoff/envdiff/actions/workflows/ci.yml)
 [![Go Report Card](https://goreportcard.com/badge/github.com/GBerghoff/envdiff)](https://goreportcard.com/report/github.com/GBerghoff/envdiff)
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](https://opensource.org/licenses/MIT)
 [![Release](https://img.shields.io/github/v/release/GBerghoff/envdiff)](https://github.com/GBerghoff/envdiff/releases/latest)
+[![Platform](https://img.shields.io/badge/platform-linux%20%7C%20macos%20%7C%20windows-lightgrey)](https://github.com/GBerghoff/envdiff/releases)
 
 > "It works on my machine" → "Show me exactly why."
 
