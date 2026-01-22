@@ -12,6 +12,16 @@
 
 Compare any two environments and get a precise, categorized diff of everything that could possibly matter.
 
+## Why envdiff?
+
+Unlike running `diff <(env)` or manual comparison:
+
+- **Structured comparison** - Categorizes by system, runtime, env vars, network
+- **Auto-redaction** - Secrets detected and hidden automatically
+- **Declarative validation** - Define requirements in YAML, validate anywhere
+- **Multiple formats** - JSON, CLI, Markdown outputs
+- **CI/CD ready** - Exit codes and JSON for automation
+
 ## Install
 
 ```bash
