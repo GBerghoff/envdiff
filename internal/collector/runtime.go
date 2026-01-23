@@ -4,6 +4,7 @@ import (
 	"os/exec"
 	"regexp"
 	"strings"
+	"sync"
 
 	"github.com/GBerghoff/envdiff/internal/snapshot"
 )
@@ -137,24 +138,33 @@ var runtimes = []RuntimeDefinition{
 // RuntimeCollector detects installed runtimes and CLI tools
 type RuntimeCollector struct{}
 
-// Collect gathers runtime information
+// Collect gathers runtime information using parallel detection
 func (c *RuntimeCollector) Collect(snap *snapshot.Snapshot) error {
-	for _, rt := range runtimes {
-		info := c.detectRuntime(rt)
-		if info != nil {
-			snap.Runtime[rt.Name] = info
-		}
+	var waitGroup sync.WaitGroup
+	var mutex sync.Mutex
+
+	for _, runtime := range runtimes {
+		waitGroup.Add(1)
+		go func(runtime RuntimeDefinition) {
+			defer waitGroup.Done()
+			if info := c.detectRuntime(runtime); info != nil {
+				mutex.Lock()
+				snap.Runtime[runtime.Name] = info
+				mutex.Unlock()
+			}
+		}(runtime)
 	}
+	waitGroup.Wait()
 	return nil
 }
 
-func (c *RuntimeCollector) detectRuntime(rt RuntimeDefinition) *snapshot.RuntimeInfo {
-	path, err := exec.LookPath(rt.Command)
+func (c *RuntimeCollector) detectRuntime(runtime RuntimeDefinition) *snapshot.RuntimeInfo {
+	path, err := exec.LookPath(runtime.Command)
 	if err != nil {
 		return nil // Not installed
 	}
 
-	cmd := exec.Command(rt.Command, rt.Args...)
+	cmd := exec.Command(runtime.Command, runtime.Args...)
 	// Capture both stdout and stderr (java outputs to stderr)
 	out, err := cmd.CombinedOutput()
 	if err != nil {
@@ -165,7 +175,7 @@ func (c *RuntimeCollector) detectRuntime(rt RuntimeDefinition) *snapshot.Runtime
 		}
 	}
 
-	version := c.extractVersion(string(out), rt.VersionRE)
+	version := c.extractVersion(string(out), runtime.VersionRE)
 	if version == "" {
 		version = "unknown"
 	}
@@ -176,8 +186,8 @@ func (c *RuntimeCollector) detectRuntime(rt RuntimeDefinition) *snapshot.Runtime
 	}
 }
 
-func (c *RuntimeCollector) extractVersion(output string, re *regexp.Regexp) string {
-	matches := re.FindStringSubmatch(output)
+func (c *RuntimeCollector) extractVersion(output string, pattern *regexp.Regexp) string {
+	matches := pattern.FindStringSubmatch(output)
 	if len(matches) >= 2 {
 		return strings.TrimSpace(matches[1])
 	}
