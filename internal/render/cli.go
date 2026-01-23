@@ -8,6 +8,7 @@ import (
 	"github.com/charmbracelet/lipgloss"
 
 	"github.com/GBerghoff/envdiff/internal/diff"
+	"github.com/GBerghoff/envdiff/internal/secrets"
 	"github.com/GBerghoff/envdiff/internal/snapshot"
 	"github.com/GBerghoff/envdiff/internal/ui"
 )
@@ -83,7 +84,7 @@ func (r *CLIRenderer) RenderSnapshot(s *snapshot.Snapshot) string {
 	b.WriteString(headerStyle.Render("ENVIRONMENT") + "\n")
 	redactedCount := 0
 	for _, v := range s.Env {
-		if v == "[REDACTED]" {
+		if v == secrets.RedactedValue {
 			redactedCount++
 		}
 	}
@@ -183,7 +184,7 @@ func (r *CLIRenderer) renderFieldDiff(name string, fieldDiff *diff.FieldDiff, no
 		return fmt.Sprintf("  %s %s %s\n",
 			redactedStyle.Render("⊘"),
 			keyStyle.Render(name),
-			redactedStyle.Render("[REDACTED]"))
+			redactedStyle.Render(secrets.RedactedValue))
 
 	case diff.StatusDifferent:
 		if len(nodes) == 2 {
