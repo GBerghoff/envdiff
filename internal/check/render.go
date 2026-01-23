@@ -6,38 +6,40 @@ import (
 	"strings"
 
 	"github.com/charmbracelet/lipgloss"
+
+	"github.com/GBerghoff/envdiff/internal/ui"
 )
 
 var (
 	titleStyle = lipgloss.NewStyle().
 			Bold(true).
-			Foreground(lipgloss.Color("99"))
+			Foreground(lipgloss.Color(ui.ColorPrimary))
 
 	headerStyle = lipgloss.NewStyle().
 			Bold(true).
-			Foreground(lipgloss.Color("241")).
+			Foreground(lipgloss.Color(ui.ColorSecondary)).
 			MarginTop(1)
 
 	checkStyle = lipgloss.NewStyle().
-			Foreground(lipgloss.Color("42"))
+			Foreground(lipgloss.Color(ui.ColorPass))
 
 	crossStyle = lipgloss.NewStyle().
-			Foreground(lipgloss.Color("196"))
+			Foreground(lipgloss.Color(ui.ColorFail))
 
 	warnStyle = lipgloss.NewStyle().
-			Foreground(lipgloss.Color("214"))
+			Foreground(lipgloss.Color(ui.ColorWarn))
 
 	keyStyle = lipgloss.NewStyle().
 			Width(14)
 
 	valueStyle = lipgloss.NewStyle().
-			Foreground(lipgloss.Color("250"))
+			Foreground(lipgloss.Color(ui.ColorValue))
 
 	dimStyle = lipgloss.NewStyle().
-			Foreground(lipgloss.Color("241"))
+			Foreground(lipgloss.Color(ui.ColorSecondary))
 
 	dividerStyle = lipgloss.NewStyle().
-			Foreground(lipgloss.Color("238"))
+			Foreground(lipgloss.Color(ui.ColorDivider))
 )
 
 // RenderCLI renders the check report for terminal display

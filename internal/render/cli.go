@@ -6,8 +6,10 @@ import (
 	"strings"
 
 	"github.com/charmbracelet/lipgloss"
+
 	"github.com/GBerghoff/envdiff/internal/diff"
 	"github.com/GBerghoff/envdiff/internal/snapshot"
+	"github.com/GBerghoff/envdiff/internal/ui"
 )
 
 // CLIRenderer renders output for the terminal
@@ -16,33 +18,33 @@ type CLIRenderer struct{}
 var (
 	titleStyle = lipgloss.NewStyle().
 			Bold(true).
-			Foreground(lipgloss.Color("99"))
+			Foreground(lipgloss.Color(ui.ColorPrimary))
 
 	headerStyle = lipgloss.NewStyle().
 			Bold(true).
-			Foreground(lipgloss.Color("241")).
+			Foreground(lipgloss.Color(ui.ColorSecondary)).
 			MarginTop(1)
 
 	checkStyle = lipgloss.NewStyle().
-			Foreground(lipgloss.Color("42"))
+			Foreground(lipgloss.Color(ui.ColorPass))
 
 	crossStyle = lipgloss.NewStyle().
-			Foreground(lipgloss.Color("196"))
+			Foreground(lipgloss.Color(ui.ColorFail))
 
 	redactedStyle = lipgloss.NewStyle().
-			Foreground(lipgloss.Color("241"))
+			Foreground(lipgloss.Color(ui.ColorSecondary))
 
 	keyStyle = lipgloss.NewStyle().
 			Width(14)
 
 	valueStyle = lipgloss.NewStyle().
-			Foreground(lipgloss.Color("250"))
+			Foreground(lipgloss.Color(ui.ColorValue))
 
 	dimStyle = lipgloss.NewStyle().
-			Foreground(lipgloss.Color("241"))
+			Foreground(lipgloss.Color(ui.ColorSecondary))
 
 	dividerStyle = lipgloss.NewStyle().
-			Foreground(lipgloss.Color("238"))
+			Foreground(lipgloss.Color(ui.ColorDivider))
 )
 
 // NewCLI creates a new CLI renderer
@@ -111,8 +113,8 @@ func (r *CLIRenderer) RenderDiff(d *diff.Diff) string {
 		b.WriteString(headerStyle.Render("RUNTIME") + "\n")
 		runtimes := sortedMapKeys(d.Diffs["runtime"])
 		for _, name := range runtimes {
-			fd := d.Diffs["runtime"][name]
-			b.WriteString(r.renderFieldDiff(name, fd, d.Nodes))
+			fieldDiff := d.Diffs["runtime"][name]
+			b.WriteString(r.renderFieldDiff(name, fieldDiff, d.Nodes))
 		}
 	}
 
@@ -124,9 +126,9 @@ func (r *CLIRenderer) RenderDiff(d *diff.Diff) string {
 		shownCount := 0
 		equalCount := 0
 		for _, name := range envKeys {
-			fd := d.Diffs["env"][name]
-			if fd.Status != "equal" {
-				b.WriteString(r.renderFieldDiff(name, fd, d.Nodes))
+			fieldDiff := d.Diffs["env"][name]
+			if fieldDiff.Status != "equal" {
+				b.WriteString(r.renderFieldDiff(name, fieldDiff, d.Nodes))
 				shownCount++
 			} else {
 				equalCount++
@@ -143,9 +145,9 @@ func (r *CLIRenderer) RenderDiff(d *diff.Diff) string {
 		systemKeys := sortedMapKeys(d.Diffs["system"])
 		equalCount := 0
 		for _, name := range systemKeys {
-			fd := d.Diffs["system"][name]
-			if fd.Status != "equal" {
-				b.WriteString(r.renderFieldDiff(name, fd, d.Nodes))
+			fieldDiff := d.Diffs["system"][name]
+			if fieldDiff.Status != "equal" {
+				b.WriteString(r.renderFieldDiff(name, fieldDiff, d.Nodes))
 			} else {
 				equalCount++
 			}
@@ -168,10 +170,10 @@ func (r *CLIRenderer) RenderDiff(d *diff.Diff) string {
 	return b.String()
 }
 
-func (r *CLIRenderer) renderFieldDiff(name string, fd *diff.FieldDiff, nodes []string) string {
-	switch fd.Status {
+func (r *CLIRenderer) renderFieldDiff(name string, fieldDiff *diff.FieldDiff, nodes []string) string {
+	switch fieldDiff.Status {
 	case "equal":
-		val := formatValue(fd.Values[nodes[0]])
+		val := formatValue(fieldDiff.NodeValues[nodes[0]])
 		return fmt.Sprintf("  %s %s %s\n",
 			checkStyle.Render("✓"),
 			keyStyle.Render(name),
@@ -186,8 +188,8 @@ func (r *CLIRenderer) renderFieldDiff(name string, fd *diff.FieldDiff, nodes []s
 	case "different":
 		if len(nodes) == 2 {
 			// Two-node diff: show "val1 → val2"
-			val1 := formatValue(fd.Values[nodes[0]])
-			val2 := formatValue(fd.Values[nodes[1]])
+			val1 := formatValue(fieldDiff.NodeValues[nodes[0]])
+			val2 := formatValue(fieldDiff.NodeValues[nodes[1]])
 			return fmt.Sprintf("  %s %s %s → %s\n",
 				crossStyle.Render("✗"),
 				keyStyle.Render(name),
@@ -200,23 +202,23 @@ func (r *CLIRenderer) renderFieldDiff(name string, fd *diff.FieldDiff, nodes []s
 				crossStyle.Render("✗"),
 				keyStyle.Render(name)))
 
-			if fd.Majority != nil {
-				line.WriteString(fmt.Sprintf("%s ", valueStyle.Render(formatValue(fd.Majority))))
-				if len(fd.Outliers) > 0 {
-					outlierVals := []string{}
-					for _, node := range fd.Outliers {
-						outlierVals = append(outlierVals,
-							fmt.Sprintf("%s=%s", node, formatValue(fd.Values[node])))
+			if fieldDiff.Majority != nil {
+				line.WriteString(fmt.Sprintf("%s ", valueStyle.Render(formatValue(fieldDiff.Majority))))
+				if len(fieldDiff.Outliers) > 0 {
+					outlierValues := []string{}
+					for _, node := range fieldDiff.Outliers {
+						outlierValues = append(outlierValues,
+							fmt.Sprintf("%s=%s", node, formatValue(fieldDiff.NodeValues[node])))
 					}
-					line.WriteString(dimStyle.Render("(outliers: " + strings.Join(outlierVals, ", ") + ")"))
+					line.WriteString(dimStyle.Render("(outliers: " + strings.Join(outlierValues, ", ") + ")"))
 				}
 			} else {
 				// No clear majority, list all values
-				vals := []string{}
+				values := []string{}
 				for _, node := range nodes {
-					vals = append(vals, fmt.Sprintf("%s=%s", node, formatValue(fd.Values[node])))
+					values = append(values, fmt.Sprintf("%s=%s", node, formatValue(fieldDiff.NodeValues[node])))
 				}
-				line.WriteString(dimStyle.Render(strings.Join(vals, ", ")))
+				line.WriteString(dimStyle.Render(strings.Join(values, ", ")))
 			}
 			line.WriteString("\n")
 			return line.String()

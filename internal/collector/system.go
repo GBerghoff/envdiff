@@ -15,25 +15,25 @@ import (
 type SystemCollector struct{}
 
 // Collect gathers system information
-func (c *SystemCollector) Collect(s *snapshot.Snapshot) error {
+func (c *SystemCollector) Collect(snap *snapshot.Snapshot) error {
 	hostname, err := os.Hostname()
 	if err != nil {
 		hostname = "unknown"
 	}
-	s.Hostname = hostname
-	s.System.Hostname = hostname
-	s.System.OS = runtime.GOOS
-	s.System.Arch = runtime.GOARCH
-	s.System.CPUCores = runtime.NumCPU()
+	snap.Hostname = hostname
+	snap.System.Hostname = hostname
+	snap.System.OS = runtime.GOOS
+	snap.System.Arch = runtime.GOARCH
+	snap.System.CPUCores = runtime.NumCPU()
 
 	// Get OS version
-	s.System.OSVersion = c.getOSVersion()
+	snap.System.OSVersion = c.getOSVersion()
 
 	// Get kernel version
-	s.System.Kernel = c.getKernel()
+	snap.System.Kernel = c.getKernel()
 
 	// Get memory
-	s.System.MemoryGB = c.getMemoryGB()
+	snap.System.MemoryGB = c.getMemoryGB()
 
 	return nil
 }

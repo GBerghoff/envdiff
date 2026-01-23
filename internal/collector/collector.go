@@ -8,11 +8,11 @@ import (
 
 // Collector is the interface for all environment collectors
 type Collector interface {
-	Collect(s *snapshot.Snapshot) error
+	Collect(snap *snapshot.Snapshot) error
 }
 
 // CollectAll runs all collectors and populates the snapshot
-func CollectAll(s *snapshot.Snapshot, redact bool) error {
+func CollectAll(snap *snapshot.Snapshot, redact bool) error {
 	collectors := []Collector{
 		&SystemCollector{},
 		&RuntimeCollector{},
@@ -21,7 +21,7 @@ func CollectAll(s *snapshot.Snapshot, redact bool) error {
 	}
 
 	for _, c := range collectors {
-		if err := c.Collect(s); err != nil {
+		if err := c.Collect(snap); err != nil {
 			// Log error but continue with other collectors
 			// We want partial snapshots rather than failing completely
 			continue

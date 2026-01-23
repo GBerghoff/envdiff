@@ -9,10 +9,10 @@ import (
 
 // FieldDiff represents the diff status for a single field
 type FieldDiff struct {
-	Status   string            `json:"status"` // "equal", "different", "redacted"
-	Values   map[string]any    `json:"values"`
-	Majority any               `json:"majority,omitempty"`
-	Outliers []string          `json:"outliers,omitempty"`
+	Status     string         `json:"status"` // "equal", "different", "redacted"
+	NodeValues map[string]any `json:"values"` // values keyed by node name
+	Majority   any            `json:"majority,omitempty"`
+	Outliers   []string       `json:"outliers,omitempty"`
 }
 
 // Summary contains diff statistics

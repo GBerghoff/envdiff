@@ -16,8 +16,8 @@ import (
 type NetworkCollector struct{}
 
 // Collect gathers network information
-func (c *NetworkCollector) Collect(s *snapshot.Snapshot) error {
-	s.Network = &snapshot.NetworkInfo{
+func (c *NetworkCollector) Collect(snap *snapshot.Snapshot) error {
+	snap.Network = &snapshot.NetworkInfo{
 		Hosts:          c.getHosts(),
 		ListeningPorts: c.getListeningPorts(),
 	}

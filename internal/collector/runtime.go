@@ -8,8 +8,8 @@ import (
 	"github.com/GBerghoff/envdiff/internal/snapshot"
 )
 
-// runtimeDef defines how to detect a runtime/CLI tool
-type runtimeDef struct {
+// RuntimeDefinition defines how to detect a runtime/CLI tool
+type RuntimeDefinition struct {
 	Name       string
 	Command    string
 	Args       []string
@@ -17,7 +17,7 @@ type runtimeDef struct {
 }
 
 // Common runtimes and CLI tools to detect
-var runtimes = []runtimeDef{
+var runtimes = []RuntimeDefinition{
 	{
 		Name:      "go",
 		Command:   "go",
@@ -138,17 +138,17 @@ var runtimes = []runtimeDef{
 type RuntimeCollector struct{}
 
 // Collect gathers runtime information
-func (c *RuntimeCollector) Collect(s *snapshot.Snapshot) error {
+func (c *RuntimeCollector) Collect(snap *snapshot.Snapshot) error {
 	for _, rt := range runtimes {
 		info := c.detectRuntime(rt)
 		if info != nil {
-			s.Runtime[rt.Name] = info
+			snap.Runtime[rt.Name] = info
 		}
 	}
 	return nil
 }
 
-func (c *RuntimeCollector) detectRuntime(rt runtimeDef) *snapshot.RuntimeInfo {
+func (c *RuntimeCollector) detectRuntime(rt RuntimeDefinition) *snapshot.RuntimeInfo {
 	path, err := exec.LookPath(rt.Command)
 	if err != nil {
 		return nil // Not installed
