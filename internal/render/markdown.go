@@ -5,6 +5,7 @@ import (
 	"strings"
 
 	"github.com/GBerghoff/envdiff/internal/diff"
+	"github.com/GBerghoff/envdiff/internal/secrets"
 	"github.com/GBerghoff/envdiff/internal/snapshot"
 )
 
@@ -53,7 +54,7 @@ func (r *MarkdownRenderer) RenderSnapshot(s *snapshot.Snapshot) string {
 	b.WriteString("## Environment\n\n")
 	redactedCount := 0
 	for _, v := range s.Env {
-		if v == "[REDACTED]" {
+		if v == secrets.RedactedValue {
 			redactedCount++
 		}
 	}
@@ -203,7 +204,7 @@ func formatMarkdownValue(v any) string {
 		return "—"
 	}
 	s := fmt.Sprintf("%v", v)
-	if s == "[REDACTED]" {
+	if s == secrets.RedactedValue {
 		return "🔒"
 	}
 	return s
