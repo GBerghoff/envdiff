@@ -9,6 +9,9 @@ import (
 	"time"
 )
 
+// SchemaVersion is the current schema version for snapshots and diffs.
+const SchemaVersion = "1"
+
 // RuntimeInfo holds version and path for a single runtime/CLI tool
 type RuntimeInfo struct {
 	Version string `json:"version"`
@@ -55,7 +58,7 @@ type Snapshot struct {
 // New creates a new Snapshot with default values
 func New() *Snapshot {
 	return &Snapshot{
-		SchemaVersion: "1",
+		SchemaVersion: SchemaVersion,
 		Timestamp:     time.Now().UTC().Format(time.RFC3339),
 		CollectedVia:  "local",
 		Runtime:       make(map[string]*RuntimeInfo),

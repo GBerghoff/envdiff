@@ -111,7 +111,7 @@ func compareEnvFields(result *Diff, snapshots map[string]*snapshot.Snapshot) {
 
 		// If any value is redacted, mark the whole field as redacted
 		if anyRedacted {
-			fieldDiff.Status = "redacted"
+			fieldDiff.Status = StatusRedacted
 			fieldDiff.Majority = nil
 			fieldDiff.Outliers = nil
 		}
@@ -142,11 +142,11 @@ func createFieldDiff(values map[string]any, nodes []string) *FieldDiff {
 	}
 
 	if allEqual {
-		fieldDiff.Status = "equal"
+		fieldDiff.Status = StatusEqual
 		return fieldDiff
 	}
 
-	fieldDiff.Status = "different"
+	fieldDiff.Status = StatusDifferent
 
 	// For N>2 nodes, calculate majority and outliers
 	if len(nodes) > 2 {
@@ -196,11 +196,11 @@ func calculateMajority(values map[string]any, nodes []string) (any, []string) {
 func updateSummary(result *Diff, fieldDiff *FieldDiff) {
 	result.Summary.TotalFields++
 	switch fieldDiff.Status {
-	case "equal":
+	case StatusEqual:
 		result.Summary.Equal++
-	case "different":
+	case StatusDifferent:
 		result.Summary.Different++
-	case "redacted":
+	case StatusRedacted:
 		result.Summary.Redacted++
 	}
 }

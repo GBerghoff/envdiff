@@ -9,7 +9,7 @@ import (
 
 // FieldDiff represents the diff status for a single field
 type FieldDiff struct {
-	Status     string         `json:"status"` // "equal", "different", "redacted"
+	Status     FieldStatus    `json:"status"`
 	NodeValues map[string]any `json:"values"` // values keyed by node name
 	Majority   any            `json:"majority,omitempty"`
 	Outliers   []string       `json:"outliers,omitempty"`
@@ -40,7 +40,7 @@ type Diff struct {
 // New creates a new Diff
 func New() *Diff {
 	return &Diff{
-		SchemaVersion: "1",
+		SchemaVersion: snapshot.SchemaVersion,
 		GeneratedAt:   time.Now().UTC().Format(time.RFC3339),
 		Nodes:         []string{},
 		Errors:        make(map[string]string),

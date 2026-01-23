@@ -100,17 +100,14 @@ func (r *Report) RenderCLI() string {
 }
 
 func renderResult(r Result) string {
-	var icon, style string
+	var icon string
 	switch r.Status {
-	case "pass":
+	case StatusPass:
 		icon = checkStyle.Render("✓")
-		style = "pass"
-	case "fail":
+	case StatusFail:
 		icon = crossStyle.Render("✗")
-		style = "fail"
-	case "warn":
+	case StatusWarn:
 		icon = warnStyle.Render("⚠")
-		style = "warn"
 	}
 
 	line := fmt.Sprintf("  %s %s %s",
@@ -118,8 +115,7 @@ func renderResult(r Result) string {
 		keyStyle.Render(r.Name),
 		valueStyle.Render(r.Actual))
 
-	switch style {
-	case "pass", "fail":
+	if r.Status == StatusPass || r.Status == StatusFail {
 		line += dimStyle.Render(fmt.Sprintf(" (requires %s)", r.Expected))
 	}
 
@@ -129,7 +125,7 @@ func renderResult(r Result) string {
 func collectFixHints(r *Report) []string {
 	var hints []string
 	for _, result := range r.Results {
-		if result.Status == "fail" && result.FixHint != "" {
+		if result.Status == StatusFail && result.FixHint != "" {
 			hints = append(hints, fmt.Sprintf("%s: %s", result.Name, result.FixHint))
 		}
 	}

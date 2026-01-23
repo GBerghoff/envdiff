@@ -114,7 +114,7 @@ func (r *MarkdownRenderer) getNodeIssues(d *diff.Diff, node string) []string {
 
 	for section, fields := range d.Diffs {
 		for name, fieldDiff := range fields {
-			if fieldDiff.Status == "different" {
+			if fieldDiff.Status == diff.StatusDifferent {
 				// Check if this node is an outlier
 				for _, outlier := range fieldDiff.Outliers {
 					if outlier == node {
@@ -138,7 +138,7 @@ func (r *MarkdownRenderer) getNodeIssues(d *diff.Diff, node string) []string {
 
 func (r *MarkdownRenderer) hasAnyDifferent(fields map[string]*diff.FieldDiff) bool {
 	for _, fieldDiff := range fields {
-		if fieldDiff.Status == "different" || fieldDiff.Status == "redacted" {
+		if fieldDiff.Status == diff.StatusDifferent || fieldDiff.Status == diff.StatusRedacted {
 			return true
 		}
 	}
@@ -171,7 +171,7 @@ func (r *MarkdownRenderer) renderComparisonTable(d *diff.Diff, section string) s
 	keys := sortedMapKeys(fields)
 	for _, name := range keys {
 		fieldDiff := fields[name]
-		if fieldDiff.Status == "equal" {
+		if fieldDiff.Status == diff.StatusEqual {
 			continue
 		}
 
@@ -186,7 +186,7 @@ func (r *MarkdownRenderer) renderComparisonTable(d *diff.Diff, section string) s
 					break
 				}
 			}
-			if isOutlier || (fieldDiff.Status == "different" && len(d.Nodes) == 2) {
+			if isOutlier || (fieldDiff.Status == diff.StatusDifferent && len(d.Nodes) == 2) {
 				val = fmt.Sprintf("**%s**", val)
 			}
 			b.WriteString(fmt.Sprintf(" %s |", val))

@@ -127,7 +127,7 @@ func (r *CLIRenderer) RenderDiff(d *diff.Diff) string {
 		equalCount := 0
 		for _, name := range envKeys {
 			fieldDiff := d.Diffs["env"][name]
-			if fieldDiff.Status != "equal" {
+			if fieldDiff.Status != diff.StatusEqual {
 				b.WriteString(r.renderFieldDiff(name, fieldDiff, d.Nodes))
 				shownCount++
 			} else {
@@ -146,7 +146,7 @@ func (r *CLIRenderer) RenderDiff(d *diff.Diff) string {
 		equalCount := 0
 		for _, name := range systemKeys {
 			fieldDiff := d.Diffs["system"][name]
-			if fieldDiff.Status != "equal" {
+			if fieldDiff.Status != diff.StatusEqual {
 				b.WriteString(r.renderFieldDiff(name, fieldDiff, d.Nodes))
 			} else {
 				equalCount++
@@ -172,20 +172,20 @@ func (r *CLIRenderer) RenderDiff(d *diff.Diff) string {
 
 func (r *CLIRenderer) renderFieldDiff(name string, fieldDiff *diff.FieldDiff, nodes []string) string {
 	switch fieldDiff.Status {
-	case "equal":
+	case diff.StatusEqual:
 		val := formatValue(fieldDiff.NodeValues[nodes[0]])
 		return fmt.Sprintf("  %s %s %s\n",
 			checkStyle.Render("✓"),
 			keyStyle.Render(name),
 			valueStyle.Render(val))
 
-	case "redacted":
+	case diff.StatusRedacted:
 		return fmt.Sprintf("  %s %s %s\n",
 			redactedStyle.Render("⊘"),
 			keyStyle.Render(name),
 			redactedStyle.Render("[REDACTED]"))
 
-	case "different":
+	case diff.StatusDifferent:
 		if len(nodes) == 2 {
 			// Two-node diff: show "val1 → val2"
 			val1 := formatValue(fieldDiff.NodeValues[nodes[0]])
