@@ -6,38 +6,40 @@ import (
 	"strings"
 
 	"github.com/charmbracelet/lipgloss"
+
+	"github.com/GBerghoff/envdiff/internal/ui"
 )
 
 var (
 	titleStyle = lipgloss.NewStyle().
 			Bold(true).
-			Foreground(lipgloss.Color("99"))
+			Foreground(lipgloss.Color(ui.ColorPrimary))
 
 	headerStyle = lipgloss.NewStyle().
 			Bold(true).
-			Foreground(lipgloss.Color("241")).
+			Foreground(lipgloss.Color(ui.ColorSecondary)).
 			MarginTop(1)
 
 	checkStyle = lipgloss.NewStyle().
-			Foreground(lipgloss.Color("42"))
+			Foreground(lipgloss.Color(ui.ColorPass))
 
 	crossStyle = lipgloss.NewStyle().
-			Foreground(lipgloss.Color("196"))
+			Foreground(lipgloss.Color(ui.ColorFail))
 
 	warnStyle = lipgloss.NewStyle().
-			Foreground(lipgloss.Color("214"))
+			Foreground(lipgloss.Color(ui.ColorWarn))
 
 	keyStyle = lipgloss.NewStyle().
 			Width(14)
 
 	valueStyle = lipgloss.NewStyle().
-			Foreground(lipgloss.Color("250"))
+			Foreground(lipgloss.Color(ui.ColorValue))
 
 	dimStyle = lipgloss.NewStyle().
-			Foreground(lipgloss.Color("241"))
+			Foreground(lipgloss.Color(ui.ColorSecondary))
 
 	dividerStyle = lipgloss.NewStyle().
-			Foreground(lipgloss.Color("238"))
+			Foreground(lipgloss.Color(ui.ColorDivider))
 )
 
 // RenderCLI renders the check report for terminal display
@@ -98,17 +100,14 @@ func (r *Report) RenderCLI() string {
 }
 
 func renderResult(r Result) string {
-	var icon, style string
+	var icon string
 	switch r.Status {
-	case "pass":
+	case StatusPass:
 		icon = checkStyle.Render("✓")
-		style = "pass"
-	case "fail":
+	case StatusFail:
 		icon = crossStyle.Render("✗")
-		style = "fail"
-	case "warn":
+	case StatusWarn:
 		icon = warnStyle.Render("⚠")
-		style = "warn"
 	}
 
 	line := fmt.Sprintf("  %s %s %s",
@@ -116,8 +115,7 @@ func renderResult(r Result) string {
 		keyStyle.Render(r.Name),
 		valueStyle.Render(r.Actual))
 
-	switch style {
-	case "pass", "fail":
+	if r.Status == StatusPass || r.Status == StatusFail {
 		line += dimStyle.Render(fmt.Sprintf(" (requires %s)", r.Expected))
 	}
 
@@ -127,7 +125,7 @@ func renderResult(r Result) string {
 func collectFixHints(r *Report) []string {
 	var hints []string
 	for _, result := range r.Results {
-		if result.Status == "fail" && result.FixHint != "" {
+		if result.Status == StatusFail && result.FixHint != "" {
 			hints = append(hints, fmt.Sprintf("%s: %s", result.Name, result.FixHint))
 		}
 	}

@@ -14,13 +14,13 @@ import (
 
 // Result represents a single check result
 type Result struct {
-	Category string `json:"category"` // "runtime" or "env"
-	Name     string `json:"name"`
-	Status   string `json:"status"`  // "pass", "fail", "warn"
-	Message  string `json:"message"`
-	Expected string `json:"expected,omitempty"`
-	Actual   string `json:"actual,omitempty"`
-	FixHint  string `json:"fix_hint,omitempty"`
+	Category string      `json:"category"` // "runtime" or "env"
+	Name     string      `json:"name"`
+	Status   CheckStatus `json:"status"`
+	Message  string      `json:"message"`
+	Expected string      `json:"expected,omitempty"`
+	Actual   string      `json:"actual,omitempty"`
+	FixHint  string      `json:"fix_hint,omitempty"`
 }
 
 // Report contains all check results
@@ -70,7 +70,7 @@ func checkRuntime(snap *snapshot.Snapshot, name, constraint string, fix config.F
 
 	info, exists := snap.Runtime[name]
 	if !exists || info == nil {
-		result.Status = "fail"
+		result.Status = StatusFail
 		result.Message = "not installed"
 		result.Actual = "(missing)"
 		if fix.Missing != "" {
@@ -83,7 +83,7 @@ func checkRuntime(snap *snapshot.Snapshot, name, constraint string, fix config.F
 
 	// Handle wildcard - any version is fine
 	if constraint == "*" {
-		result.Status = "pass"
+		result.Status = StatusPass
 		result.Message = "installed"
 		return result
 	}
@@ -91,7 +91,7 @@ func checkRuntime(snap *snapshot.Snapshot, name, constraint string, fix config.F
 	// Parse and check version constraint
 	c, err := semver.NewConstraint(constraint)
 	if err != nil {
-		result.Status = "warn"
+		result.Status = StatusWarn
 		result.Message = fmt.Sprintf("invalid constraint: %s", constraint)
 		return result
 	}
@@ -100,16 +100,16 @@ func checkRuntime(snap *snapshot.Snapshot, name, constraint string, fix config.F
 	version := normalizeVersion(info.Version)
 	v, err := semver.NewVersion(version)
 	if err != nil {
-		result.Status = "warn"
+		result.Status = StatusWarn
 		result.Message = fmt.Sprintf("cannot parse version: %s", info.Version)
 		return result
 	}
 
 	if c.Check(v) {
-		result.Status = "pass"
+		result.Status = StatusPass
 		result.Message = fmt.Sprintf("satisfies %s", constraint)
 	} else {
-		result.Status = "fail"
+		result.Status = StatusFail
 		result.Message = fmt.Sprintf("does not satisfy %s", constraint)
 		if fix.WrongVersion != "" {
 			result.FixHint = fix.WrongVersion
@@ -128,14 +128,14 @@ func checkEnvRequired(snap *snapshot.Snapshot, name string, fix config.FixConfig
 
 	val, exists := snap.Env[name]
 	if !exists || val == "" {
-		result.Status = "fail"
+		result.Status = StatusFail
 		result.Message = "not set"
 		result.Actual = "(missing)"
 		if fix.Missing != "" {
 			result.FixHint = fix.Missing
 		}
 	} else {
-		result.Status = "pass"
+		result.Status = StatusPass
 		result.Message = "set"
 		result.Actual = "(set)"
 	}
@@ -152,7 +152,7 @@ func checkEnvExpected(snap *snapshot.Snapshot, name, expected string, fix config
 
 	val, exists := snap.Env[name]
 	if !exists {
-		result.Status = "fail"
+		result.Status = StatusFail
 		result.Message = "not set"
 		result.Actual = "(missing)"
 		if fix.Missing != "" {
@@ -163,10 +163,10 @@ func checkEnvExpected(snap *snapshot.Snapshot, name, expected string, fix config
 
 	result.Actual = val
 	if val == expected {
-		result.Status = "pass"
+		result.Status = StatusPass
 		result.Message = "matches"
 	} else {
-		result.Status = "fail"
+		result.Status = StatusFail
 		result.Message = fmt.Sprintf("expected %s", expected)
 		if fix.WrongVersion != "" {
 			result.FixHint = fix.WrongVersion
@@ -176,13 +176,13 @@ func checkEnvExpected(snap *snapshot.Snapshot, name, expected string, fix config
 	return result
 }
 
-func updateCounts(report *Report, status string) {
+func updateCounts(report *Report, status CheckStatus) {
 	switch status {
-	case "pass":
+	case StatusPass:
 		report.Passed++
-	case "fail":
+	case StatusFail:
 		report.Failed++
-	case "warn":
+	case StatusWarn:
 		report.Warned++
 	}
 }

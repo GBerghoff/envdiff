@@ -9,45 +9,45 @@ import (
 
 // Compare compares multiple snapshots and produces a Diff
 func Compare(snapshots map[string]*snapshot.Snapshot) *Diff {
-	d := New()
+	result := New()
 
 	// Build node list
 	for name := range snapshots {
-		d.Nodes = append(d.Nodes, name)
-		d.Snapshots[name] = snapshots[name]
+		result.Nodes = append(result.Nodes, name)
+		result.Snapshots[name] = snapshots[name]
 	}
 
-	d.Summary.TotalNodes = len(d.Nodes)
-	d.Summary.SuccessfulNodes = len(d.Nodes)
+	result.Summary.TotalNodes = len(result.Nodes)
+	result.Summary.SuccessfulNodes = len(result.Nodes)
 
 	// Initialize diff sections
-	d.Diffs["system"] = make(map[string]*FieldDiff)
-	d.Diffs["runtime"] = make(map[string]*FieldDiff)
-	d.Diffs["env"] = make(map[string]*FieldDiff)
+	result.Diffs["system"] = make(map[string]*FieldDiff)
+	result.Diffs["runtime"] = make(map[string]*FieldDiff)
+	result.Diffs["env"] = make(map[string]*FieldDiff)
 
 	// Compare system fields
-	compareSystemFields(d, snapshots)
+	compareSystemFields(result, snapshots)
 
 	// Compare runtime versions
-	compareRuntimeFields(d, snapshots)
+	compareRuntimeFields(result, snapshots)
 
 	// Compare environment variables
-	compareEnvFields(d, snapshots)
+	compareEnvFields(result, snapshots)
 
-	return d
+	return result
 }
 
-func compareSystemFields(d *Diff, snapshots map[string]*snapshot.Snapshot) {
+func compareSystemFields(result *Diff, snapshots map[string]*snapshot.Snapshot) {
 	fields := []struct {
 		name   string
 		getter func(*snapshot.Snapshot) any
 	}{
-		{"os", func(s *snapshot.Snapshot) any { return s.System.OS }},
-		{"os_version", func(s *snapshot.Snapshot) any { return s.System.OSVersion }},
-		{"arch", func(s *snapshot.Snapshot) any { return s.System.Arch }},
-		{"kernel", func(s *snapshot.Snapshot) any { return s.System.Kernel }},
-		{"cpu_cores", func(s *snapshot.Snapshot) any { return s.System.CPUCores }},
-		{"memory_gb", func(s *snapshot.Snapshot) any { return s.System.MemoryGB }},
+		{"os", func(snap *snapshot.Snapshot) any { return snap.System.OS }},
+		{"os_version", func(snap *snapshot.Snapshot) any { return snap.System.OSVersion }},
+		{"arch", func(snap *snapshot.Snapshot) any { return snap.System.Arch }},
+		{"kernel", func(snap *snapshot.Snapshot) any { return snap.System.Kernel }},
+		{"cpu_cores", func(snap *snapshot.Snapshot) any { return snap.System.CPUCores }},
+		{"memory_gb", func(snap *snapshot.Snapshot) any { return snap.System.MemoryGB }},
 	}
 
 	for _, f := range fields {
@@ -55,12 +55,12 @@ func compareSystemFields(d *Diff, snapshots map[string]*snapshot.Snapshot) {
 		for name, snap := range snapshots {
 			values[name] = f.getter(snap)
 		}
-		d.Diffs["system"][f.name] = createFieldDiff(values, d.Nodes)
-		updateSummary(d, d.Diffs["system"][f.name])
+		result.Diffs["system"][f.name] = createFieldDiff(values, result.Nodes)
+		updateSummary(result, result.Diffs["system"][f.name])
 	}
 }
 
-func compareRuntimeFields(d *Diff, snapshots map[string]*snapshot.Snapshot) {
+func compareRuntimeFields(result *Diff, snapshots map[string]*snapshot.Snapshot) {
 	// Gather all runtime keys across all snapshots
 	allRuntimes := make(map[string]bool)
 	for _, snap := range snapshots {
@@ -78,12 +78,12 @@ func compareRuntimeFields(d *Diff, snapshots map[string]*snapshot.Snapshot) {
 				values[name] = nil
 			}
 		}
-		d.Diffs["runtime"][rt] = createFieldDiff(values, d.Nodes)
-		updateSummary(d, d.Diffs["runtime"][rt])
+		result.Diffs["runtime"][rt] = createFieldDiff(values, result.Nodes)
+		updateSummary(result, result.Diffs["runtime"][rt])
 	}
 }
 
-func compareEnvFields(d *Diff, snapshots map[string]*snapshot.Snapshot) {
+func compareEnvFields(result *Diff, snapshots map[string]*snapshot.Snapshot) {
 	// Gather all env keys across all snapshots
 	allEnvs := make(map[string]bool)
 	for _, snap := range snapshots {
@@ -107,23 +107,23 @@ func compareEnvFields(d *Diff, snapshots map[string]*snapshot.Snapshot) {
 			}
 		}
 
-		fd := createFieldDiff(values, d.Nodes)
+		fieldDiff := createFieldDiff(values, result.Nodes)
 
 		// If any value is redacted, mark the whole field as redacted
 		if anyRedacted {
-			fd.Status = "redacted"
-			fd.Majority = nil
-			fd.Outliers = nil
+			fieldDiff.Status = StatusRedacted
+			fieldDiff.Majority = nil
+			fieldDiff.Outliers = nil
 		}
 
-		d.Diffs["env"][envKey] = fd
-		updateSummary(d, fd)
+		result.Diffs["env"][envKey] = fieldDiff
+		updateSummary(result, fieldDiff)
 	}
 }
 
 func createFieldDiff(values map[string]any, nodes []string) *FieldDiff {
-	fd := &FieldDiff{
-		Values: values,
+	fieldDiff := &FieldDiff{
+		NodeValues: values,
 	}
 
 	// Check if all values are equal
@@ -142,18 +142,18 @@ func createFieldDiff(values map[string]any, nodes []string) *FieldDiff {
 	}
 
 	if allEqual {
-		fd.Status = "equal"
-		return fd
+		fieldDiff.Status = StatusEqual
+		return fieldDiff
 	}
 
-	fd.Status = "different"
+	fieldDiff.Status = StatusDifferent
 
 	// For N>2 nodes, calculate majority and outliers
 	if len(nodes) > 2 {
-		fd.Majority, fd.Outliers = calculateMajority(values, nodes)
+		fieldDiff.Majority, fieldDiff.Outliers = calculateMajority(values, nodes)
 	}
 
-	return fd
+	return fieldDiff
 }
 
 func calculateMajority(values map[string]any, nodes []string) (any, []string) {
@@ -193,14 +193,14 @@ func calculateMajority(values map[string]any, nodes []string) (any, []string) {
 	return maxVal, outliers
 }
 
-func updateSummary(d *Diff, fd *FieldDiff) {
-	d.Summary.TotalFields++
-	switch fd.Status {
-	case "equal":
-		d.Summary.Equal++
-	case "different":
-		d.Summary.Different++
-	case "redacted":
-		d.Summary.Redacted++
+func updateSummary(result *Diff, fieldDiff *FieldDiff) {
+	result.Summary.TotalFields++
+	switch fieldDiff.Status {
+	case StatusEqual:
+		result.Summary.Equal++
+	case StatusDifferent:
+		result.Summary.Different++
+	case StatusRedacted:
+		result.Summary.Redacted++
 	}
 }

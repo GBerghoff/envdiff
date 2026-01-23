@@ -113,17 +113,17 @@ func (r *MarkdownRenderer) getNodeIssues(d *diff.Diff, node string) []string {
 	var issues []string
 
 	for section, fields := range d.Diffs {
-		for name, fd := range fields {
-			if fd.Status == "different" {
+		for name, fieldDiff := range fields {
+			if fieldDiff.Status == diff.StatusDifferent {
 				// Check if this node is an outlier
-				for _, outlier := range fd.Outliers {
+				for _, outlier := range fieldDiff.Outliers {
 					if outlier == node {
 						issues = append(issues, fmt.Sprintf("%s %s", section, name))
 						break
 					}
 				}
 				// For 2-node diffs, both are "different"
-				if len(d.Nodes) == 2 && len(fd.Outliers) == 0 {
+				if len(d.Nodes) == 2 && len(fieldDiff.Outliers) == 0 {
 					// Only add once
 					if node == d.Nodes[0] {
 						issues = append(issues, name)
@@ -137,8 +137,8 @@ func (r *MarkdownRenderer) getNodeIssues(d *diff.Diff, node string) []string {
 }
 
 func (r *MarkdownRenderer) hasAnyDifferent(fields map[string]*diff.FieldDiff) bool {
-	for _, fd := range fields {
-		if fd.Status == "different" || fd.Status == "redacted" {
+	for _, fieldDiff := range fields {
+		if fieldDiff.Status == diff.StatusDifferent || fieldDiff.Status == diff.StatusRedacted {
 			return true
 		}
 	}
@@ -170,23 +170,23 @@ func (r *MarkdownRenderer) renderComparisonTable(d *diff.Diff, section string) s
 	// Data rows (only different/redacted fields)
 	keys := sortedMapKeys(fields)
 	for _, name := range keys {
-		fd := fields[name]
-		if fd.Status == "equal" {
+		fieldDiff := fields[name]
+		if fieldDiff.Status == diff.StatusEqual {
 			continue
 		}
 
 		b.WriteString(fmt.Sprintf("| %s |", name))
 		for _, node := range d.Nodes {
-			val := formatMarkdownValue(fd.Values[node])
+			val := formatMarkdownValue(fieldDiff.NodeValues[node])
 			// Bold outliers
 			isOutlier := false
-			for _, o := range fd.Outliers {
+			for _, o := range fieldDiff.Outliers {
 				if o == node {
 					isOutlier = true
 					break
 				}
 			}
-			if isOutlier || (fd.Status == "different" && len(d.Nodes) == 2) {
+			if isOutlier || (fieldDiff.Status == diff.StatusDifferent && len(d.Nodes) == 2) {
 				val = fmt.Sprintf("**%s**", val)
 			}
 			b.WriteString(fmt.Sprintf(" %s |", val))

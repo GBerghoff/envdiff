@@ -14,7 +14,7 @@ type EnvCollector struct {
 }
 
 // Collect gathers environment variables
-func (c *EnvCollector) Collect(s *snapshot.Snapshot) error {
+func (c *EnvCollector) Collect(snap *snapshot.Snapshot) error {
 	env := make(map[string]string)
 
 	for _, e := range os.Environ() {
@@ -25,9 +25,9 @@ func (c *EnvCollector) Collect(s *snapshot.Snapshot) error {
 	}
 
 	if c.Redact {
-		s.Env = secrets.RedactEnv(env)
+		snap.Env = secrets.RedactEnv(env)
 	} else {
-		s.Env = env
+		snap.Env = env
 	}
 
 	return nil
