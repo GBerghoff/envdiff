@@ -62,8 +62,12 @@ func TestComputeID_Deterministic(t *testing.T) {
 		Env:           make(map[string]string),
 	}
 
-	_ = snap1.ComputeID()
-	_ = snap2.ComputeID()
+	if err := snap1.ComputeID(); err != nil {
+		t.Fatalf("ComputeID() for snap1 error = %v", err)
+	}
+	if err := snap2.ComputeID(); err != nil {
+		t.Fatalf("ComputeID() for snap2 error = %v", err)
+	}
 
 	if snap1.SnapshotID != snap2.SnapshotID {
 		t.Errorf("Same content should produce same ID: %q != %q", snap1.SnapshotID, snap2.SnapshotID)

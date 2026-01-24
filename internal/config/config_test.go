@@ -3,6 +3,7 @@ package config
 import (
 	"os"
 	"path/filepath"
+	"strings"
 	"testing"
 )
 
@@ -54,10 +55,10 @@ func TestToYAML(t *testing.T) {
 	}
 
 	yamlStr := string(data)
-	if !contains(yamlStr, "go:") {
+	if !strings.Contains(yamlStr, "go:") {
 		t.Error("YAML should contain go runtime")
 	}
-	if !contains(yamlStr, "DATABASE_URL") {
+	if !strings.Contains(yamlStr, "DATABASE_URL") {
 		t.Error("YAML should contain required env var")
 	}
 }
@@ -132,23 +133,11 @@ func TestTemplate(t *testing.T) {
 	if len(template) == 0 {
 		t.Error("Template() should return non-empty string")
 	}
-	if !contains(template, "runtime:") {
+	if !strings.Contains(template, "runtime:") {
 		t.Error("Template should contain runtime section")
 	}
-	if !contains(template, "env:") {
+	if !strings.Contains(template, "env:") {
 		t.Error("Template should contain env section")
 	}
 }
 
-func contains(str, substr string) bool {
-	return len(str) >= len(substr) && (str == substr || len(str) > 0 && containsSubstring(str, substr))
-}
-
-func containsSubstring(str, substr string) bool {
-	for i := 0; i <= len(str)-len(substr); i++ {
-		if str[i:i+len(substr)] == substr {
-			return true
-		}
-	}
-	return false
-}
