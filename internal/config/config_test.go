@@ -82,7 +82,7 @@ fix:
   go:
     missing: "brew install go"
 `
-	if err := os.WriteFile(configPath, []byte(yamlContent), 0644); err != nil {
+	if err := os.WriteFile(configPath, []byte(yamlContent), 0600); err != nil {
 		t.Fatalf("Failed to write test config: %v", err)
 	}
 
@@ -116,7 +116,7 @@ func TestLoad_InvalidYAML(t *testing.T) {
 	tmpDir := t.TempDir()
 	configPath := filepath.Join(tmpDir, "invalid.yaml")
 
-	if err := os.WriteFile(configPath, []byte("invalid: [yaml: content"), 0644); err != nil {
+	if err := os.WriteFile(configPath, []byte("invalid: [yaml: content"), 0600); err != nil {
 		t.Fatalf("Failed to write test file: %v", err)
 	}
 
