@@ -80,9 +80,9 @@ func (r *Report) RenderCLI() string {
 	// Summary
 	b.WriteString("\n")
 	b.WriteString(dividerStyle.Render(strings.Repeat("─", 40)) + "\n")
-	b.WriteString(fmt.Sprintf("%d passed · %d failed", r.Passed, r.Failed))
+	fmt.Fprintf(&b, "%d passed · %d failed", r.Passed, r.Failed)
 	if r.Warned > 0 {
-		b.WriteString(fmt.Sprintf(" · %d warnings", r.Warned))
+		fmt.Fprintf(&b, " · %d warnings", r.Warned)
 	}
 	b.WriteString("\n")
 
@@ -92,7 +92,7 @@ func (r *Report) RenderCLI() string {
 		b.WriteString("\n")
 		b.WriteString(dimStyle.Render("To fix:") + "\n")
 		for _, hint := range hints {
-			b.WriteString(fmt.Sprintf("  • %s\n", hint))
+			fmt.Fprintf(&b, "  • %s\n", hint)
 		}
 	}
 

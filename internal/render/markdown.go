@@ -22,19 +22,19 @@ func (r *MarkdownRenderer) RenderSnapshot(s *snapshot.Snapshot) string {
 	var b strings.Builder
 
 	b.WriteString("# Environment Snapshot\n\n")
-	b.WriteString(fmt.Sprintf("**Host:** %s  \n", s.Hostname))
-	b.WriteString(fmt.Sprintf("**Timestamp:** %s  \n", s.Timestamp))
-	b.WriteString(fmt.Sprintf("**Collected via:** %s\n\n", s.CollectedVia))
+	fmt.Fprintf(&b, "**Host:** %s  \n", s.Hostname)
+	fmt.Fprintf(&b, "**Timestamp:** %s  \n", s.Timestamp)
+	fmt.Fprintf(&b, "**Collected via:** %s\n\n", s.CollectedVia)
 
 	// System
 	b.WriteString("## System\n\n")
 	b.WriteString("| Field | Value |\n")
 	b.WriteString("|-------|-------|\n")
-	b.WriteString(fmt.Sprintf("| OS | %s |\n", s.System.OSVersion))
-	b.WriteString(fmt.Sprintf("| Architecture | %s |\n", s.System.Arch))
-	b.WriteString(fmt.Sprintf("| Kernel | %s |\n", s.System.Kernel))
-	b.WriteString(fmt.Sprintf("| CPU Cores | %d |\n", s.System.CPUCores))
-	b.WriteString(fmt.Sprintf("| Memory | %d GB |\n", s.System.MemoryGB))
+	fmt.Fprintf(&b, "| OS | %s |\n", s.System.OSVersion)
+	fmt.Fprintf(&b, "| Architecture | %s |\n", s.System.Arch)
+	fmt.Fprintf(&b, "| Kernel | %s |\n", s.System.Kernel)
+	fmt.Fprintf(&b, "| CPU Cores | %d |\n", s.System.CPUCores)
+	fmt.Fprintf(&b, "| Memory | %d GB |\n", s.System.MemoryGB)
 	b.WriteString("\n")
 
 	// Runtime
@@ -45,7 +45,7 @@ func (r *MarkdownRenderer) RenderSnapshot(s *snapshot.Snapshot) string {
 	for _, name := range runtimes {
 		info := s.Runtime[name]
 		if info != nil {
-			b.WriteString(fmt.Sprintf("| %s | %s | %s |\n", name, info.Version, info.Path))
+			fmt.Fprintf(&b, "| %s | %s | %s |\n", name, info.Version, info.Path)
 		}
 	}
 	b.WriteString("\n")
@@ -58,7 +58,7 @@ func (r *MarkdownRenderer) RenderSnapshot(s *snapshot.Snapshot) string {
 			redactedCount++
 		}
 	}
-	b.WriteString(fmt.Sprintf("%d variables (%d redacted)\n\n", len(s.Env), redactedCount))
+	fmt.Fprintf(&b, "%d variables (%d redacted)\n\n", len(s.Env), redactedCount)
 
 	return b.String()
 }
@@ -68,8 +68,8 @@ func (r *MarkdownRenderer) RenderDiff(d *diff.Diff) string {
 	var b strings.Builder
 
 	b.WriteString("# Environment Diff\n\n")
-	b.WriteString(fmt.Sprintf("**Generated:** %s  \n", d.GeneratedAt))
-	b.WriteString(fmt.Sprintf("**Nodes:** %d | **Different:** %d\n\n", len(d.Nodes), d.Summary.Different))
+	fmt.Fprintf(&b, "**Generated:** %s  \n", d.GeneratedAt)
+	fmt.Fprintf(&b, "**Nodes:** %d | **Different:** %d\n\n", len(d.Nodes), d.Summary.Different)
 
 	// Summary table
 	b.WriteString("## Summary\n\n")
@@ -77,13 +77,13 @@ func (r *MarkdownRenderer) RenderDiff(d *diff.Diff) string {
 	b.WriteString("|------|--------|--------|\n")
 	for _, node := range d.Nodes {
 		if err, ok := d.Errors[node]; ok {
-			b.WriteString(fmt.Sprintf("| %s | ❌ error | %s |\n", node, err))
+			fmt.Fprintf(&b, "| %s | ❌ error | %s |\n", node, err)
 		} else {
 			issues := r.getNodeIssues(d, node)
 			if len(issues) == 0 {
-				b.WriteString(fmt.Sprintf("| %s | ✓ ok | — |\n", node))
+				fmt.Fprintf(&b, "| %s | ✓ ok | — |\n", node)
 			} else {
-				b.WriteString(fmt.Sprintf("| %s | ⚠ differs | %s |\n", node, strings.Join(issues, ", ")))
+				fmt.Fprintf(&b, "| %s | ⚠ differs | %s |\n", node, strings.Join(issues, ", "))
 			}
 		}
 	}
@@ -157,7 +157,7 @@ func (r *MarkdownRenderer) renderComparisonTable(d *diff.Diff, section string) s
 	// Header row
 	b.WriteString("| Field |")
 	for _, node := range d.Nodes {
-		b.WriteString(fmt.Sprintf(" %s |", node))
+		fmt.Fprintf(&b, " %s |", node)
 	}
 	b.WriteString("\n")
 
@@ -176,7 +176,7 @@ func (r *MarkdownRenderer) renderComparisonTable(d *diff.Diff, section string) s
 			continue
 		}
 
-		b.WriteString(fmt.Sprintf("| %s |", name))
+		fmt.Fprintf(&b, "| %s |", name)
 		for _, node := range d.Nodes {
 			val := formatMarkdownValue(fieldDiff.NodeValues[node])
 			// Bold outliers
@@ -190,7 +190,7 @@ func (r *MarkdownRenderer) renderComparisonTable(d *diff.Diff, section string) s
 			if isOutlier || (fieldDiff.Status == diff.StatusDifferent && len(d.Nodes) == 2) {
 				val = fmt.Sprintf("**%s**", val)
 			}
-			b.WriteString(fmt.Sprintf(" %s |", val))
+			fmt.Fprintf(&b, " %s |", val)
 		}
 		b.WriteString("\n")
 	}
