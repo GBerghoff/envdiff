@@ -61,11 +61,11 @@ func (r *CLIRenderer) RenderSnapshot(s *snapshot.Snapshot) string {
 
 	// System info
 	b.WriteString(headerStyle.Render("SYSTEM") + "\n")
-	b.WriteString(fmt.Sprintf("  %s %s\n", keyStyle.Render("os"), valueStyle.Render(s.System.OSVersion)))
-	b.WriteString(fmt.Sprintf("  %s %s\n", keyStyle.Render("arch"), valueStyle.Render(s.System.Arch)))
-	b.WriteString(fmt.Sprintf("  %s %s\n", keyStyle.Render("kernel"), valueStyle.Render(s.System.Kernel)))
-	b.WriteString(fmt.Sprintf("  %s %d cores\n", keyStyle.Render("cpu"), s.System.CPUCores))
-	b.WriteString(fmt.Sprintf("  %s %dGB\n", keyStyle.Render("memory"), s.System.MemoryGB))
+	fmt.Fprintf(&b, "  %s %s\n", keyStyle.Render("os"), valueStyle.Render(s.System.OSVersion))
+	fmt.Fprintf(&b, "  %s %s\n", keyStyle.Render("arch"), valueStyle.Render(s.System.Arch))
+	fmt.Fprintf(&b, "  %s %s\n", keyStyle.Render("kernel"), valueStyle.Render(s.System.Kernel))
+	fmt.Fprintf(&b, "  %s %d cores\n", keyStyle.Render("cpu"), s.System.CPUCores)
+	fmt.Fprintf(&b, "  %s %dGB\n", keyStyle.Render("memory"), s.System.MemoryGB)
 
 	// Runtime info
 	b.WriteString(headerStyle.Render("RUNTIME") + "\n")
@@ -73,10 +73,10 @@ func (r *CLIRenderer) RenderSnapshot(s *snapshot.Snapshot) string {
 	for _, name := range runtimes {
 		info := s.Runtime[name]
 		if info != nil {
-			b.WriteString(fmt.Sprintf("  %s %s %s\n",
+			fmt.Fprintf(&b, "  %s %s %s\n",
 				checkStyle.Render("✓"),
 				keyStyle.Render(name),
-				valueStyle.Render(info.Version)))
+				valueStyle.Render(info.Version))
 		}
 	}
 
@@ -88,7 +88,7 @@ func (r *CLIRenderer) RenderSnapshot(s *snapshot.Snapshot) string {
 			redactedCount++
 		}
 	}
-	b.WriteString(fmt.Sprintf("  %d variables (%d redacted)\n", len(s.Env), redactedCount))
+	fmt.Fprintf(&b, "  %d variables (%d redacted)\n", len(s.Env), redactedCount)
 
 	return b.String()
 }
@@ -104,7 +104,7 @@ func (r *CLIRenderer) RenderDiff(d *diff.Diff) string {
 	// Errors
 	if len(d.Errors) > 0 {
 		for node, err := range d.Errors {
-			b.WriteString(fmt.Sprintf("  %s %s: %s\n", crossStyle.Render("⚠"), node, err))
+			fmt.Fprintf(&b, "  %s %s: %s\n", crossStyle.Render("⚠"), node, err)
 		}
 		b.WriteString("\n")
 	}
@@ -136,7 +136,7 @@ func (r *CLIRenderer) RenderDiff(d *diff.Diff) string {
 			}
 		}
 		if equalCount > 0 {
-			b.WriteString(fmt.Sprintf("  %s %d variables match\n", checkStyle.Render("✓"), equalCount))
+			fmt.Fprintf(&b, "  %s %d variables match\n", checkStyle.Render("✓"), equalCount)
 		}
 	}
 
@@ -154,15 +154,15 @@ func (r *CLIRenderer) RenderDiff(d *diff.Diff) string {
 			}
 		}
 		if equalCount > 0 {
-			b.WriteString(fmt.Sprintf("  %s %d fields match\n", checkStyle.Render("✓"), equalCount))
+			fmt.Fprintf(&b, "  %s %d fields match\n", checkStyle.Render("✓"), equalCount)
 		}
 	}
 
 	// Summary
 	b.WriteString("\n")
 	b.WriteString(dividerStyle.Render(strings.Repeat("─", 40)) + "\n")
-	b.WriteString(fmt.Sprintf("%d different · %d equal · %d redacted\n",
-		d.Summary.Different, d.Summary.Equal, d.Summary.Redacted))
+	fmt.Fprintf(&b, "%d different · %d equal · %d redacted\n",
+		d.Summary.Different, d.Summary.Equal, d.Summary.Redacted)
 
 	if d.Summary.Redacted > 0 {
 		b.WriteString(dimStyle.Render("\nNote: Redacted values not compared. Use --no-redact to include.") + "\n")
@@ -199,12 +199,12 @@ func (r *CLIRenderer) renderFieldDiff(name string, fieldDiff *diff.FieldDiff, no
 		} else {
 			// Multi-node diff: show outliers
 			var line strings.Builder
-			line.WriteString(fmt.Sprintf("  %s %s ",
+			fmt.Fprintf(&line, "  %s %s ",
 				crossStyle.Render("✗"),
-				keyStyle.Render(name)))
+				keyStyle.Render(name))
 
 			if fieldDiff.Majority != nil {
-				line.WriteString(fmt.Sprintf("%s ", valueStyle.Render(formatValue(fieldDiff.Majority))))
+				fmt.Fprintf(&line, "%s ", valueStyle.Render(formatValue(fieldDiff.Majority)))
 				if len(fieldDiff.Outliers) > 0 {
 					outlierValues := []string{}
 					for _, node := range fieldDiff.Outliers {

@@ -19,6 +19,9 @@ linters:
       # G204: Subprocess with variable args - expected for CLI that detects tool versions
       - linters: [gosec]
         text: "G204"
+      # G703: Path traversal via taint - expected for CLI that writes to user-specified paths
+      - linters: [gosec]
+        text: "G703"
 
 issues:
   max-issues-per-linter: 0
