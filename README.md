@@ -136,6 +136,12 @@ env:
     - SHELL
     - "*_SESSION*"
 
+# Verify presence of system-level packages
+packages:
+  - build-essential
+  - git
+  - libssl-dev
+
 # Add custom tool probing for tools not supported by default
 custom_runtimes:
   - name: my-internal-tool
