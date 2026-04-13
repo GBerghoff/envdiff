@@ -36,7 +36,7 @@ var (
 			Foreground(lipgloss.Color(ui.ColorSecondary))
 
 	keyStyle = lipgloss.NewStyle().
-			Width(14)
+			Width(20)
 
 	valueStyle = lipgloss.NewStyle().
 			Foreground(lipgloss.Color(ui.ColorValue))
@@ -90,6 +90,24 @@ func (r *CLIRenderer) RenderSnapshot(s *snapshot.Snapshot) string {
 	}
 	fmt.Fprintf(&b, "  %d variables (%d redacted)\n", len(s.Env), redactedCount)
 
+	// Packages info
+	if s.Packages != nil && len(s.Packages.Items) > 0 {
+		b.WriteString(headerStyle.Render("PACKAGES") + " (" + s.Packages.Manager + ")\n")
+		pkgNames := make([]string, 0, len(s.Packages.Items))
+		for name := range s.Packages.Items {
+			pkgNames = append(pkgNames, name)
+		}
+		sort.Strings(pkgNames)
+
+		for _, name := range pkgNames {
+			version := s.Packages.Items[name]
+			fmt.Fprintf(&b, "  %s %s %s\n",
+				checkStyle.Render("✓"),
+				keyStyle.Render(name),
+				valueStyle.Render(version))
+		}
+	}
+
 	return b.String()
 }
 
@@ -115,6 +133,16 @@ func (r *CLIRenderer) RenderDiff(d *diff.Diff) string {
 		runtimes := sortedMapKeys(d.Diffs["runtime"])
 		for _, name := range runtimes {
 			fieldDiff := d.Diffs["runtime"][name]
+			b.WriteString(r.renderFieldDiff(name, fieldDiff, d.Nodes))
+		}
+	}
+
+	// Package diffs
+	if len(d.Diffs["package"]) > 0 {
+		b.WriteString(headerStyle.Render("PACKAGES") + "\n")
+		pkgs := sortedMapKeys(d.Diffs["package"])
+		for _, name := range pkgs {
+			fieldDiff := d.Diffs["package"][name]
 			b.WriteString(r.renderFieldDiff(name, fieldDiff, d.Nodes))
 		}
 	}

@@ -48,15 +48,18 @@ func runSnapshot(cmd *cobra.Command, args []string) error {
 	// Create snapshot
 	snap := snapshot.New()
 
-	// Optionally load config for custom runtimes
+	// Optionally load config for custom runtimes and packages
 	var runtimesToProbe []collector.RuntimeDefinition
+	var packageNames []string
+
 	// 1. Add all registered runtimes
 	for _, def := range collector.Registry {
 		runtimesToProbe = append(runtimesToProbe, def)
 	}
 
-	// 2. Add custom runtimes from config
+	// 2. Add config from file if it exists
 	if cfg, err := config.Load(snapshotFile); err == nil {
+		packageNames = cfg.Packages
 		for _, custom := range cfg.CustomRuntimes {
 			def, err := collector.NewRuntimeDefinition(custom.Name, custom.Command, custom.VersionRE, custom.Args)
 			if err == nil {
@@ -67,7 +70,7 @@ func runSnapshot(cmd *cobra.Command, args []string) error {
 
 	// Run collectors
 	redact := !snapshotNoRedact
-	if err := collector.CollectAll(snap, redact, runtimesToProbe); err != nil {
+	if err := collector.CollectAll(snap, redact, runtimesToProbe, packageNames); err != nil {
 		return fmt.Errorf("failed to collect environment: %w", err)
 	}
 

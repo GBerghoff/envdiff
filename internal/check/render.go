@@ -30,7 +30,7 @@ var (
 			Foreground(lipgloss.Color(ui.ColorWarn))
 
 	keyStyle = lipgloss.NewStyle().
-			Width(14)
+			Width(20)
 
 	valueStyle = lipgloss.NewStyle().
 			Foreground(lipgloss.Color(ui.ColorValue))
@@ -51,6 +51,7 @@ func (r *Report) RenderCLI() string {
 	// Group by category
 	runtimeResults := []Result{}
 	envResults := []Result{}
+	pkgResults := []Result{}
 
 	for _, result := range r.Results {
 		switch result.Category {
@@ -58,6 +59,8 @@ func (r *Report) RenderCLI() string {
 			runtimeResults = append(runtimeResults, result)
 		case "env":
 			envResults = append(envResults, result)
+		case "package":
+			pkgResults = append(pkgResults, result)
 		}
 	}
 
@@ -65,6 +68,14 @@ func (r *Report) RenderCLI() string {
 	if len(runtimeResults) > 0 {
 		b.WriteString(headerStyle.Render("RUNTIME") + "\n")
 		for _, result := range runtimeResults {
+			b.WriteString(renderResult(result))
+		}
+	}
+
+	// Render pkg section
+	if len(pkgResults) > 0 {
+		b.WriteString(headerStyle.Render("PACKAGES") + "\n")
+		for _, result := range pkgResults {
 			b.WriteString(renderResult(result))
 		}
 	}
