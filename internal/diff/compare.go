@@ -24,6 +24,7 @@ func Compare(snapshots map[string]*snapshot.Snapshot) *Diff {
 	result.Diffs["system"] = make(map[string]*FieldDiff)
 	result.Diffs["runtime"] = make(map[string]*FieldDiff)
 	result.Diffs["env"] = make(map[string]*FieldDiff)
+	result.Diffs["package"] = make(map[string]*FieldDiff)
 
 	// Compare system fields
 	compareSystemFields(result, snapshots)
@@ -34,7 +35,39 @@ func Compare(snapshots map[string]*snapshot.Snapshot) *Diff {
 	// Compare environment variables
 	compareEnvFields(result, snapshots)
 
+	// Compare system packages
+	comparePackageFields(result, snapshots)
+
 	return result
+}
+
+func comparePackageFields(result *Diff, snapshots map[string]*snapshot.Snapshot) {
+	// Gather all package keys across all snapshots
+	allPackages := make(map[string]bool)
+	for _, snap := range snapshots {
+		if snap.Packages != nil {
+			for pkg := range snap.Packages.Items {
+				allPackages[pkg] = true
+			}
+		}
+	}
+
+	for pkg := range allPackages {
+		values := make(map[string]any)
+		for name, snap := range snapshots {
+			if snap.Packages != nil {
+				if version, ok := snap.Packages.Items[pkg]; ok {
+					values[name] = version
+				} else {
+					values[name] = nil
+				}
+			} else {
+				values[name] = nil
+			}
+		}
+		result.Diffs["package"][pkg] = createFieldDiff(values, result.Nodes)
+		updateSummary(result, result.Diffs["package"][pkg])
+	}
 }
 
 func compareSystemFields(result *Diff, snapshots map[string]*snapshot.Snapshot) {

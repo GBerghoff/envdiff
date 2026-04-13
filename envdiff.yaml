@@ -33,6 +33,11 @@ env:
     - "*_SESSION*"
     - "*_TOKEN*"
 
+# Packages to verify (opt-in, not checked by default)
+packages:
+  - build-essential
+  - git
+
 # Custom tool probing definitions
 # Add tools that envdiff doesn't support out of the box
 custom_runtimes:

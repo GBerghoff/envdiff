@@ -69,7 +69,7 @@ func runCheck(cmd *cobra.Command, args []string) error {
 		runtimesToProbe = append(runtimesToProbe, def)
 	}
 
-	if err := collector.CollectAll(snap, false, runtimesToProbe); err != nil {
+	if err := collector.CollectAll(snap, false, runtimesToProbe, cfg.Packages); err != nil {
 		return fmt.Errorf("failed to collect environment: %w", err)
 	}
 

@@ -2,6 +2,7 @@ package render
 
 import (
 	"fmt"
+	"sort"
 	"strings"
 
 	"github.com/GBerghoff/envdiff/internal/diff"
@@ -60,6 +61,24 @@ func (r *MarkdownRenderer) RenderSnapshot(s *snapshot.Snapshot) string {
 	}
 	fmt.Fprintf(&b, "%d variables (%d redacted)\n\n", len(s.Env), redactedCount)
 
+	// Packages
+	if s.Packages != nil && len(s.Packages.Items) > 0 {
+		b.WriteString("## Packages (" + s.Packages.Manager + ")\n\n")
+		b.WriteString("| Package | Version |\n")
+		b.WriteString("|---------|---------|\n")
+		pkgNames := make([]string, 0, len(s.Packages.Items))
+		for name := range s.Packages.Items {
+			pkgNames = append(pkgNames, name)
+		}
+		sort.Strings(pkgNames)
+
+		for _, name := range pkgNames {
+			version := s.Packages.Items[name]
+			fmt.Fprintf(&b, "| %s | %s |\n", name, version)
+		}
+		b.WriteString("\n")
+	}
+
 	return b.String()
 }
 
@@ -93,6 +112,12 @@ func (r *MarkdownRenderer) RenderDiff(d *diff.Diff) string {
 	if r.hasAnyDifferent(d.Diffs["runtime"]) {
 		b.WriteString("## Runtime\n\n")
 		b.WriteString(r.renderComparisonTable(d, "runtime"))
+	}
+
+	// Package table
+	if r.hasAnyDifferent(d.Diffs["package"]) {
+		b.WriteString("## Packages\n\n")
+		b.WriteString(r.renderComparisonTable(d, "package"))
 	}
 
 	// Environment table (only different ones)

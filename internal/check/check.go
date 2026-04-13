@@ -68,7 +68,45 @@ func Check(snap *snapshot.Snapshot, cfg *config.Config) *Report {
 		updateCounts(report, result.Status)
 	}
 
+	// Check required system packages
+	for _, name := range cfg.Packages {
+		result := checkPackage(snap, name, cfg.Fix[name])
+		report.Results = append(report.Results, result)
+		updateCounts(report, result.Status)
+	}
+
 	return report
+}
+
+func checkPackage(snap *snapshot.Snapshot, name string, fix config.FixConfig) Result {
+	result := Result{
+		Category: "package",
+		Name:     name,
+		Expected: "(installed)",
+	}
+
+	if snap.Packages == nil || snap.Packages.Items == nil {
+		result.Status = StatusFail
+		result.Message = "no package manager detected or no packages collected"
+		result.Actual = "(missing)"
+		return result
+	}
+
+	version, exists := snap.Packages.Items[name]
+	if !exists {
+		result.Status = StatusFail
+		result.Message = "not installed"
+		result.Actual = "(missing)"
+		if fix.Missing != "" {
+			result.FixHint = fix.Missing
+		}
+	} else {
+		result.Status = StatusPass
+		result.Message = fmt.Sprintf("installed via %s", snap.Packages.Manager)
+		result.Actual = version
+	}
+
+	return result
 }
 
 func checkRuntime(snap *snapshot.Snapshot, name, constraint string, fix config.FixConfig) Result {
