@@ -63,13 +63,13 @@ Capture your environment to JSON.
 envdiff snapshot                    # JSON to stdout
 envdiff snapshot -o local.json      # Save to file
 envdiff snapshot --format cli       # Pretty terminal output
-envdiff snapshot --format md        # Markdown output
+envdiff snapshot --file custom.yaml # Use custom runtimes from config
 envdiff snapshot --no-redact        # Include secret values
 ```
 
 **What's captured:**
 - System info (OS, arch, kernel, memory, CPU)
-- Runtime versions (go, node, python, docker, kubectl, etc.)
+- Runtime versions (go, node, python, docker, etc. + custom ones)
 - Environment variables (secrets auto-redacted)
 - Network info (/etc/hosts, listening ports)
 
@@ -114,7 +114,7 @@ envdiff init --force                # Overwrite existing
 
 ## Configuration
 
-`envdiff.yaml` defines your environment requirements:
+`envdiff.yaml` defines your environment requirements. **Note:** `envdiff check` only probes the runtimes explicitly listed here to keep your validation focused and relevant to your baseline.
 
 ```yaml
 runtime:
@@ -135,6 +135,13 @@ env:
     - TERM
     - SHELL
     - "*_SESSION*"
+
+# Add custom tool probing for tools not supported by default
+custom_runtimes:
+  - name: my-internal-tool
+    command: internal-cli
+    args: ["--version"]
+    regex: "v(\\d+\\.\\d+)"
 
 fix:
   node:

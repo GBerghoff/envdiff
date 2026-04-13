@@ -9,7 +9,7 @@ import (
 func TestCollectAll_PopulatesSnapshot(t *testing.T) {
 	snap := snapshot.New()
 
-	err := CollectAll(snap, false)
+	err := CollectAll(snap, false, nil)
 	if err != nil {
 		t.Fatalf("CollectAll() error = %v", err)
 	}
@@ -28,7 +28,7 @@ func TestCollectAll_PopulatesSnapshot(t *testing.T) {
 func TestCollectAll_WithRedaction(t *testing.T) {
 	snap := snapshot.New()
 
-	err := CollectAll(snap, true)
+	err := CollectAll(snap, true, nil)
 	if err != nil {
 		t.Fatalf("CollectAll() error = %v", err)
 	}

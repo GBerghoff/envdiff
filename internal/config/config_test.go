@@ -127,6 +127,68 @@ func TestLoad_InvalidYAML(t *testing.T) {
 	}
 }
 
+func TestConfig_GetRequiredRuntimes(t *testing.T) {
+	cfg := &Config{
+		Runtime: map[string]string{
+			"go":   ">= 1.21.0",
+			"node": ">= 18.0.0",
+		},
+		CustomRuntimes: []CustomRuntimeConfig{
+			{
+				Name:      "my-tool",
+				Command:   "my-tool-cli",
+				VersionRE: `v(\d+)`,
+			},
+		},
+	}
+
+	required := cfg.GetRequiredRuntimes()
+	if len(required) != 3 {
+		t.Errorf("expected 3 required runtimes, got %d", len(required))
+	}
+	if !required["go"] || !required["node"] || !required["my-tool"] {
+		t.Error("missing expected runtimes in required map")
+	}
+}
+
+func TestConfig_CustomRuntimes(t *testing.T) {
+	tmpDir := t.TempDir()
+	configPath := filepath.Join(tmpDir, "envdiff.yaml")
+
+	yamlContent := `
+runtime:
+  go: ">= 1.21.0"
+custom_runtimes:
+  - name: "my-tool"
+    command: "my-tool-cli"
+    args: ["--version"]
+    regex: "v(\\d+)"
+`
+	if err := os.WriteFile(configPath, []byte(yamlContent), 0600); err != nil {
+		t.Fatalf("Failed to write test config: %v", err)
+	}
+
+	cfg, err := Load(configPath)
+	if err != nil {
+		t.Fatalf("Load() error = %v", err)
+	}
+
+	if len(cfg.CustomRuntimes) != 1 {
+		t.Fatalf("expected 1 custom runtime, got %d", len(cfg.CustomRuntimes))
+	}
+
+	custom := cfg.CustomRuntimes[0]
+	if custom.Name != "my-tool" {
+		t.Errorf("expected name 'my-tool', got %q", custom.Name)
+	}
+	if custom.Command != "my-tool-cli" {
+		t.Errorf("expected command 'my-tool-cli', got %q", custom.Command)
+	}
+	if custom.VersionRE != "v(\\d+)" {
+		t.Errorf("expected regex 'v(\\d+)', got %q", custom.VersionRE)
+	}
+}
+
 func TestTemplate(t *testing.T) {
 	template := Template()
 

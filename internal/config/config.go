@@ -10,10 +10,19 @@ import (
 
 // Config represents the envdiff.yaml configuration file
 type Config struct {
-	Runtime  map[string]string `yaml:"runtime"`
-	Env      EnvConfig         `yaml:"env"`
-	Packages []string          `yaml:"packages,omitempty"`
-	Fix      map[string]FixConfig `yaml:"fix,omitempty"`
+	Runtime        map[string]string   `yaml:"runtime"`
+	Env            EnvConfig           `yaml:"env"`
+	Packages       []string            `yaml:"packages,omitempty"`
+	CustomRuntimes []CustomRuntimeConfig `yaml:"custom_runtimes,omitempty"`
+	Fix            map[string]FixConfig `yaml:"fix,omitempty"`
+}
+
+// CustomRuntimeConfig defines a project-specific tool to probe
+type CustomRuntimeConfig struct {
+	Name      string   `yaml:"name"`
+	Command   string   `yaml:"command"`
+	Args      []string `yaml:"args,omitempty"`
+	VersionRE string   `yaml:"regex"`
 }
 
 // EnvConfig holds environment variable requirements
@@ -83,6 +92,19 @@ func (c *Config) ToYAML() ([]byte, error) {
 	return yaml.Marshal(c)
 }
 
+// GetRequiredRuntimes returns a map of runtime names that should be probed.
+// This is used by the collector to filter what it searches for.
+func (c *Config) GetRequiredRuntimes() map[string]bool {
+	required := make(map[string]bool)
+	for name := range c.Runtime {
+		required[name] = true
+	}
+	for _, custom := range c.CustomRuntimes {
+		required[custom.Name] = true
+	}
+	return required
+}
+
 // Template returns a commented YAML template
 func Template() string {
 	return `# envdiff.yaml - Environment requirements
@@ -126,6 +148,13 @@ env:
 # packages:
 #   - nginx
 #   - redis-server
+
+# Custom tool probing definitions
+# custom_runtimes:
+#   - name: "my-internal-tool"
+#     command: "internal-cli"
+#     args: ["--version"]
+#     regex: "v(\\d+\\.\\d+)"
 
 # Remediation hints (shown when check fails)
 # fix:

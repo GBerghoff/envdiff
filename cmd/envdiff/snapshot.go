@@ -5,6 +5,7 @@ import (
 	"os"
 
 	"github.com/GBerghoff/envdiff/internal/collector"
+	"github.com/GBerghoff/envdiff/internal/config"
 	"github.com/GBerghoff/envdiff/internal/render"
 	"github.com/GBerghoff/envdiff/internal/snapshot"
 	"github.com/spf13/cobra"
@@ -14,6 +15,7 @@ var (
 	snapshotNoRedact bool
 	snapshotOutput   string
 	snapshotFormat   string
+	snapshotFile     string
 )
 
 var snapshotCmd = &cobra.Command{
@@ -39,15 +41,33 @@ func init() {
 	snapshotCmd.Flags().BoolVar(&snapshotNoRedact, "no-redact", false, "Include actual secret values (use with caution)")
 	snapshotCmd.Flags().StringVarP(&snapshotOutput, "output", "o", "", "Output file (default: stdout)")
 	snapshotCmd.Flags().StringVar(&snapshotFormat, "format", "json", "Output format: json, cli, md")
+	snapshotCmd.Flags().StringVarP(&snapshotFile, "file", "f", "envdiff.yaml", "Path to optional config file for custom runtimes")
 }
 
 func runSnapshot(cmd *cobra.Command, args []string) error {
 	// Create snapshot
 	snap := snapshot.New()
 
+	// Optionally load config for custom runtimes
+	var runtimesToProbe []collector.RuntimeDefinition
+	// 1. Add all registered runtimes
+	for _, def := range collector.Registry {
+		runtimesToProbe = append(runtimesToProbe, def)
+	}
+
+	// 2. Add custom runtimes from config
+	if cfg, err := config.Load(snapshotFile); err == nil {
+		for _, custom := range cfg.CustomRuntimes {
+			def, err := collector.NewRuntimeDefinition(custom.Name, custom.Command, custom.VersionRE, custom.Args)
+			if err == nil {
+				runtimesToProbe = append(runtimesToProbe, def)
+			}
+		}
+	}
+
 	// Run collectors
 	redact := !snapshotNoRedact
-	if err := collector.CollectAll(snap, redact); err != nil {
+	if err := collector.CollectAll(snap, redact, runtimesToProbe); err != nil {
 		return fmt.Errorf("failed to collect environment: %w", err)
 	}
 

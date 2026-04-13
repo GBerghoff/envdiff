@@ -48,7 +48,28 @@ func runCheck(cmd *cobra.Command, args []string) error {
 
 	// Take a snapshot (no redaction needed for check)
 	snap := snapshot.New()
-	if err := collector.CollectAll(snap, false); err != nil {
+
+	// Filter collectors to only probe what's in the config
+	requiredRuntimes := cfg.GetRequiredRuntimes()
+	var runtimesToProbe []collector.RuntimeDefinition
+
+	// 1. Add requested runtimes from registry
+	for name := range requiredRuntimes {
+		if def, ok := collector.Registry[name]; ok {
+			runtimesToProbe = append(runtimesToProbe, def)
+		}
+	}
+
+	// 2. Add custom runtimes from config
+	for _, custom := range cfg.CustomRuntimes {
+		def, err := collector.NewRuntimeDefinition(custom.Name, custom.Command, custom.VersionRE, custom.Args)
+		if err != nil {
+			return fmt.Errorf("invalid custom runtime %s: %w", custom.Name, err)
+		}
+		runtimesToProbe = append(runtimesToProbe, def)
+	}
+
+	if err := collector.CollectAll(snap, false, runtimesToProbe); err != nil {
 		return fmt.Errorf("failed to collect environment: %w", err)
 	}
 

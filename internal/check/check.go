@@ -44,6 +44,16 @@ func Check(snap *snapshot.Snapshot, cfg *config.Config) *Report {
 		updateCounts(report, result.Status)
 	}
 
+	// Check custom runtimes that might not have a version constraint but should exist
+	for _, custom := range cfg.CustomRuntimes {
+		// Only check if not already checked in Runtime map
+		if _, checked := cfg.Runtime[custom.Name]; !checked {
+			result := checkRuntime(snap, custom.Name, "*", cfg.Fix[custom.Name])
+			report.Results = append(report.Results, result)
+			updateCounts(report, result.Status)
+		}
+	}
+
 	// Check required environment variables
 	for _, name := range cfg.Env.Required {
 		result := checkEnvRequired(snap, name, cfg.Fix[name])

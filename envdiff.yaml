@@ -1,0 +1,48 @@
+# envdiff.yaml - Environment requirements
+# Run 'envdiff check' to validate your environment against these requirements
+
+# Runtime version constraints (semver)
+# envdiff check only probes runtimes listed here or in custom_runtimes
+runtime:
+  go: ">= 1.21.0"
+  node: ">= 18.0.0"
+  python: ">= 3.10.0"
+  docker: "*"  # any version, just needs to exist
+
+# Environment variable requirements
+env:
+  # Variables that must be set (value doesn't matter)
+  required:
+    # - DATABASE_URL
+    # - AWS_PROFILE
+
+  # Variables that must have specific values
+  expected:
+    # NODE_ENV: development
+
+  # Variables to ignore when comparing (glob patterns supported)
+  ignore:
+    - TERM
+    - SHELL
+    - HOME
+    - USER
+    - PATH
+    - PWD
+    - LANG
+    - "LC_*"
+    - "*_SESSION*"
+    - "*_TOKEN*"
+
+# Custom tool probing definitions
+# Add tools that envdiff doesn't support out of the box
+custom_runtimes:
+  # - name: "my-internal-tool"
+  #   command: "internal-cli"
+  #   args: ["--version"]
+  #   regex: "v(\\d+\\.\\d+)"
+
+# Remediation hints (shown when check fails)
+fix:
+  node:
+    missing: "brew install node@20"
+    wrong_version: "nvm use 20"

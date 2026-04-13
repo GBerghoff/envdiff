@@ -68,7 +68,7 @@ A `Snapshot` is an immutable, content-addressable capture of an environment at a
 | Section | Contents |
 |---------|----------|
 | System | OS, version, architecture, kernel, CPU cores, memory |
-| Runtime | Installed tools with versions and paths (Go, Node, Python, Docker, etc.) |
+| Runtime | Installed tools with versions and paths. Defaults to 20+ common runtimes, plus any defined in `custom_runtimes` in your config. |
 | Env | Environment variables (with optional redaction) |
 | Network | Hosts file entries, listening ports |
 
@@ -84,6 +84,12 @@ runtime:
   node: ">= 18.0.0"
   docker: "*"          # any version
 
+custom_runtimes:
+  - name: internal-cli
+    command: internal-cli
+    args: ["--version"]
+    regex: "v(\\d+\\.\\d+)"
+
 env:
   required:
     - DATABASE_URL
@@ -98,6 +104,8 @@ fix:
     missing: "brew install node@20"
     wrong_version: "nvm use 20"
 ```
+
+**Note:** `envdiff check` uses *Config-driven Probing*, meaning it only scans for runtimes explicitly listed in the `runtime` or `custom_runtimes` sections of your config. This ensures your validation results stay focused on your specific standards.
 
 ### Diff
 
@@ -200,10 +208,10 @@ Each collector is independent and failures are isolated, allowing partial snapsh
 The `CollectAll()` function orchestrates all collectors:
 
 ```go
-func CollectAll(s *snapshot.Snapshot, redact bool) error {
+func CollectAll(s *snapshot.Snapshot, redact bool, customRuntimes []RuntimeDefinition) error {
     collectors := []Collector{
         &SystemCollector{},
-        &RuntimeCollector{},
+        &RuntimeCollector{Definitions: customRuntimes},
         &EnvCollector{Redact: redact},
         &NetworkCollector{},
     }
@@ -261,32 +269,19 @@ if len(nodes) == 2 {
 
 ## Extension Points
 
-### Adding a New Collector
+### Adding a New Collector (via Config)
 
-1. Create a new file in `internal/collector/` (e.g., `docker.go`)
-2. Implement the `Collector` interface:
+The easiest way to add a new tool for probing is via the `envdiff.yaml` file:
 
-```go
-type DockerCollector struct{}
-
-func (c *DockerCollector) Collect(s *snapshot.Snapshot) error {
-    // Gather Docker-specific data
-    // Populate relevant fields in s
-    return nil
-}
+```yaml
+custom_runtimes:
+  - name: "my-tool"
+    command: "my-tool-cli"
+    args: ["--version"]
+    regex: "v(\\d+\\.\\d+)"
 ```
 
-3. Register the collector in `CollectAll()`:
-
-```go
-collectors := []Collector{
-    &SystemCollector{},
-    &RuntimeCollector{},
-    &EnvCollector{Redact: redact},
-    &NetworkCollector{},
-    &DockerCollector{},  // New collector
-}
-```
+### Adding a New Collector (via Code)
 
 ### Adding a New Output Format
 

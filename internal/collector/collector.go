@@ -12,10 +12,10 @@ type Collector interface {
 }
 
 // CollectAll runs all collectors and populates the snapshot
-func CollectAll(snap *snapshot.Snapshot, redact bool) error {
+func CollectAll(snap *snapshot.Snapshot, redact bool, customRuntimes []RuntimeDefinition) error {
 	collectors := []Collector{
 		&SystemCollector{},
-		&RuntimeCollector{},
+		&RuntimeCollector{Definitions: customRuntimes},
 		&EnvCollector{Redact: redact},
 		&NetworkCollector{},
 	}
