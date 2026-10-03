@@ -160,6 +160,37 @@ func TestCompare_RedactedEnvVars(t *testing.T) {
 	}
 }
 
+func TestCompare_RedactedEnvVarMissingOnOneNode(t *testing.T) {
+	snapshots := map[string]*snapshot.Snapshot{
+		"local": {
+			System:  snapshot.SystemInfo{},
+			Runtime: map[string]*snapshot.RuntimeInfo{},
+			Env:     map[string]string{"API_KEY": "[REDACTED]"},
+		},
+		"ci": {
+			System:  snapshot.SystemInfo{},
+			Runtime: map[string]*snapshot.RuntimeInfo{},
+			Env:     map[string]string{},
+		},
+	}
+
+	result := Compare(snapshots)
+
+	apiKeyDiff := result.Diffs["env"]["API_KEY"]
+	if apiKeyDiff.Status != StatusDifferent {
+		t.Errorf("API_KEY Status = %q, want %q (a secret missing in CI is a real difference)", apiKeyDiff.Status, StatusDifferent)
+	}
+	if apiKeyDiff.NodeValues["ci"] != nil {
+		t.Error("ci should have nil value for missing API_KEY")
+	}
+	if apiKeyDiff.NodeValues["local"] != "[REDACTED]" {
+		t.Errorf("local value = %v, want [REDACTED] (never the secret)", apiKeyDiff.NodeValues["local"])
+	}
+	if result.Summary.Redacted != 0 || result.Summary.Different != 1 {
+		t.Errorf("Summary redacted=%d different=%d, want 0 and 1", result.Summary.Redacted, result.Summary.Different)
+	}
+}
+
 func TestCalculateMajority_ClearMajority(t *testing.T) {
 	values := map[string]any{
 		"node1": "1.22.0",
