@@ -128,6 +128,7 @@ func compareEnvFields(result *Diff, snapshots map[string]*snapshot.Snapshot) {
 	for envKey := range allEnvs {
 		values := make(map[string]any)
 		anyRedacted := false
+		anyMissing := false
 
 		for name, snap := range snapshots {
 			if val, ok := snap.Env[envKey]; ok {
@@ -137,13 +138,17 @@ func compareEnvFields(result *Diff, snapshots map[string]*snapshot.Snapshot) {
 				}
 			} else {
 				values[name] = nil
+				anyMissing = true
 			}
 		}
 
 		fieldDiff := createFieldDiff(values, result.Nodes)
 
-		// If any value is redacted, mark the whole field as redacted
-		if anyRedacted {
+		// If any value is redacted, mark the whole field as redacted, unless
+		// the variable is missing on some node: that is a real difference (a
+		// secret set locally but absent in CI), and showing [REDACTED] vs
+		// (missing) leaks no value.
+		if anyRedacted && !anyMissing {
 			fieldDiff.Status = StatusRedacted
 			fieldDiff.Majority = nil
 			fieldDiff.Outliers = nil
