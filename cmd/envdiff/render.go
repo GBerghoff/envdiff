@@ -2,6 +2,7 @@ package main
 
 import (
 	"fmt"
+	"io"
 	"os"
 
 	"github.com/GBerghoff/envdiff/internal/diff"
@@ -23,7 +24,8 @@ var renderCmd = &cobra.Command{
 Examples:
   envdiff render snapshot.json           # CLI output (default)
   envdiff render diff.json --md          # Markdown output
-  envdiff render diff.json --md -o report.md`,
+  envdiff render diff.json --md -o report.md
+  envdiff compare a.json b.json | envdiff render -   # Read from stdin`,
 	Args: cobra.ExactArgs(1),
 	RunE: runRender,
 }
@@ -34,7 +36,13 @@ func init() {
 }
 
 func runRender(cmd *cobra.Command, args []string) error {
-	data, err := os.ReadFile(args[0])
+	var data []byte
+	var err error
+	if args[0] == "-" {
+		data, err = io.ReadAll(cmd.InOrStdin())
+	} else {
+		data, err = os.ReadFile(args[0])
+	}
 	if err != nil {
 		return fmt.Errorf("failed to read file: %w", err)
 	}
